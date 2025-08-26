@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Member Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <script src="../config/server-config.js"></script>
+</head>
+<body class="light-mode loading">
+  <header class="disabled ">
+    <!-- --------------------------------- ED ---------------------------------- -->
+    <aside class="notification-sidebar" id="notificationSidebar">
+    <div class="notification-icon" onclick="toggleNotifications()">🔔
+      <span id="notificationCount">0</span>
+    </div>
+    <h2>Notifications</h2>
+    <ul id="notificationList">
+    </ul>
+  </aside>
+  <div class="overlay" id="overlay" onclick="toggleNotifications()"></div>
+    <!-- ----------------------------------------------------------------------- -->
+    <div class="header-content">
+      <h1>Member Dashboard</h1>
+      <div class="header-buttons">
+        <button id="RelatedLinks" class="header-btn">
+          <i class="fas fa-link"></i>
+          Related Links
+        </button>
+        <a id="lapDates" href="../lapDates/getDates.html" class="header-btn" style="display: none;">
+          <i class="fas fa-calendar-alt"></i>
+          Lab Dates
+        </a>
+      </div>
+      <div class="disabled" id="related-links">
+        <ul>
+          <li name = "x"><a href="#">Components</a></li>
+          <li name = "x"><a href="#">Components</a></li>
+          <li name = "x"><a href="#">Components</a></li>
+          <li name = "x"><a href="#">Components</a></li>
+        </ul>
+      </div>
+      <div class="user-info">
+        <div class="avatar-container">
+          <img id="userAvatar" alt="User avatar" class="avatar">
+          <button id="changeAvatarBtn" class="change-avatar-btn">
+            <i class="fas fa-camera"></i>
+            Change Photo
+          </button>
+          <input type="file" id="avatarInput" accept="image/*" style="display: none">
+        </div>
+        <div>
+          <p id="userName" class="user-name"></p>
+          <p id="userRole" class="user-role"></p>
+        </div>
+      </div>
+    </div>
+  </header>
+  <div class="bino load ">
+    <div class="bino_head">
+        <div class="eye"></div>
+        <div class="eye"></div>
+    </div>
+  </div>
+  <main class="disabled" >
+    <div class="dashboard-grid">
+      <!-- Profile Card -->
+      <div class="card profile-card">
+        <div class="card-header">
+          <i class="icon user-icon"></i>
+          <h2>Profile Info</h2>
+        </div>
+        <div class="profile-info">
+          <p><span>Email:</span> <span id="userEmail"></span></p>
+          <p><span>Committee:</span> <span id="userCommittee"></span></p>
+          <p><span>Phone:</span> <span id="userPhone"></span></p>
+          <p><span>Status:</span> <span id="userStatus" class="status-badge"></span></p>
+          <p><span>Average Rate:</span> <span id="avgRate" class="status-badge"></span></p>
+        </div>
+      </div>
+
+      <!-- Tasks Card -->
+      <div class="card tasks-card">
+        <div class="card-header">
+          <i class="icon book-icon"></i>
+          <h2>Current Tasks</h2>
+        </div>
+        <div id="CurrentTasksList" class="tasks-list"></div>
+      </div>
+     
+      <!-- Tracks Card -->
+      <!-- <div class="card tracks-card">
+        <div class="card-header">
+          <i class="icon book-icon"></i>
+          <h2>Current Tracks</h2>
+          <button class="addtrack" ><a href="../Tracks/index.html"> Add track </a></button>
+        </div>
+        <div id="tracksList" class="tracks-list"></div>
+      </div> -->
+
+      <!-- Courses and Tasks Card -->
+      <!-- <div class="card courses-tasks-card">
+        <div class="card-header">
+          <i class="icon tasks-icon"></i>
+          <h2 id="courseTasksTitle">Select a Track</h2>
+        </div>
+        
+        <div id="coursesContainer" class="courses-container"></div>
+
+        <div id="tasksContainer" class="tasks-container">
+          <div class="progress-bar-container">
+            <div class="progress-label">Course Progress</div>
+            <div class="progress-bar">
+              <div id="progressBarFill" class="progress-bar-fill"></div>
+            </div>
+            <div id="progressText" class="progress-text">0%</div>
+          </div>
+          <div id="tasksList" class="tasks-list"></div>
+        </div>
+      </div> -->
+    </div>
+    <!-- history tasks  -->
+    <div class="card history-tasks-card">
+      <div class="card-header">
+        <i class="icon book-icon"></i>
+        <h2>History Tasks</h2>
+      </div>
+      <div id="HistoryTasksList" class="tasks-list"></div>
+    </div>
+  </main>
+
+  <!-- Submit Task Modal -->
+  <div id="submitTaskModal" class="modal">
+    <div class="modal-content">
+      <h2>Submit Task</h2>
+      <form id="submitTaskForm" enctype="multipart/form-data">
+        <div class="form-group">
+          <label for="submissionLink">Submission Link:</label>
+          <input type="url" id="submissionLink" name="submissionUrl" required>
+          <input type="file" name="file" id="file" title="Upload file" placeholder="Choose a file">
+        </div>
+        <div class="form-actions">
+          <button type="submit">Submit</button>
+          <button type="button" class="cancel-btn">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <!-- Submit Ta Modal -->
+  <!-- <div id="submitTaskModal" class="modal">
+    <div class="modal-content">
+      <h2>Submit Task</h2>
+      <form id="submitTaskForm">
+        <div class="form-group">
+          <label for="submissionLink">Submission Link:</label>
+          <input type="url" id="submissionLink" required>
+        </div>
+        <div class="form-actions">
+          <button type="submit">Submit</button>
+          <button type="button" class="cancel-btn">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div> -->
+
+  <button id="darkModeToggle" class="dark-mode-toggle" title="Toggle dark mode">
+    <i class="icon moon-icon"></i>
+  </button>
+
+  <script src="../config/server-config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
