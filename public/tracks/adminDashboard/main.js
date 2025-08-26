@@ -1,4 +1,5 @@
-const backendURL = "https://assiut-robotics-server.vercel.app/"; // Replace with your backend URL
+// Use global API_BASE_URL defined in config/server-config.js
+const backendURL = API_BASE_URL + "/";
 
 // Electric Data Model
 var electricData = {

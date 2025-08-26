@@ -68,7 +68,7 @@ function renderComponentManagement(){
     //   prodata = [];
     // }                      //  this code replaced with get the data from DB 
     const getComponents = async () => {
-      const res = await fetch("https://assiut-robotics-server.vercel.app/components/getComponents")
+  const res = await fetch(`${API_BASE_URL}/components/getComponents`)
       if (res.ok) {
         const response = await res.json();
         console.log(response);
@@ -93,7 +93,7 @@ function renderComponentManagement(){
           dataObject[key] = value;
         }
 
-        const res = await fetch("https://assiut-robotics-server.vercel.app/components/update", {
+  const res = await fetch(`${API_BASE_URL}/components/update`, {
           method: "POST",
           headers: {
             'Content-Type': 'application/json',
@@ -214,7 +214,7 @@ function renderComponentManagement(){
       data = {
         id
       }
-      const res = await fetch("https://assiut-robotics-server.vercel.app/components/deleteOne", {
+  const res = await fetch(`${API_BASE_URL}/components/deleteOne`, {
         method: "post",
         headers: {
           "Content-Type": "application/json",
@@ -334,7 +334,7 @@ function renderComponentManagement(){
           console.log(`${key}: ${value}`); 
         }
     
-        const res = await fetch("https://assiut-robotics-server.vercel.app/components/add", {
+  const res = await fetch(`${API_BASE_URL}/components/add`, {
           method: "post",
           body: formData
         })
@@ -356,7 +356,7 @@ function renderComponentManagement(){
     }
     
     const deleteAll = async () => {
-      const res = await fetch("https://assiut-robotics-server.vercel.app/components/deleteAll")
+  const res = await fetch(`${API_BASE_URL}/components/deleteAll`)
       if (res.ok) {
         const response = await res.json();
         console.log(await response);
@@ -394,7 +394,7 @@ function renderRequestedComponents(body){
   body.innerHTML = ""
   const token = localStorage.getItem("token")
   // get data 
-  fetch("https://assiut-robotics-server.vercel.app/components/getRequestedComponent", {
+  fetch(`${API_BASE_URL}/components/getRequestedComponent`, {
     method: "GET",
     headers: {
       Authorization: "bearer " + token
@@ -462,7 +462,7 @@ function renderRequestedComponents(body){
         // Hide popup after confirming
         document.getElementById("deadlinePopup").style.display = "none";
 
-        fetch("https://assiut-robotics-server.vercel.app/components/acceptRequestToBorrow", {
+  fetch(`${API_BASE_URL}/components/acceptRequestToBorrow`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -491,7 +491,7 @@ function renderRequestedComponents(body){
         const component = res.data[e.target.id];
         console.log(component);
 
-        fetch("https://assiut-robotics-server.vercel.app/components/rejectRequestToBorrow",{
+  fetch(`${API_BASE_URL}/components/rejectRequestToBorrow`,{
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -522,7 +522,7 @@ function renderBorrowedComponents(){
   body.innerHTML = ""
   const token = localStorage.getItem("token")
   // get data 
-  fetch("https://assiut-robotics-server.vercel.app/components/getBorrowedComponent", {
+  fetch(`${API_BASE_URL}/components/getBorrowedComponent`, {
     method: "GET",
     headers: {
       Authorization: "bearer " + token

@@ -1,11 +1,9 @@
 
 // API URLs
-const API_URL = serverConfig.getApiUrl("members/login");
-const VERIFY_URL = serverConfig.getApiUrl("members/verify");
-const CHANGE_PROFILE_IMAGE_URL =
-  serverConfig.getApiUrl("members/changeProfileImage");
-const SUBMIT_TASK_URL =
-  serverConfig.getApiUrl("members/submitTask");
+const API_URL = `${API_BASE_URL}/members/login`;
+const VERIFY_URL = `${API_BASE_URL}/members/verify`;
+const CHANGE_PROFILE_IMAGE_URL = `${API_BASE_URL}/members/changeProfileImage`;
+const SUBMIT_TASK_URL = `${API_BASE_URL}/members/submitTask`;
 
 // State management
 let currentMemberData = null;

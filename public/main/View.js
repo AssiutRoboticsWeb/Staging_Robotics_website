@@ -1,3 +1,5 @@
+// To use API_BASE_URL for API calls, example:
+// fetch(`${API_BASE_URL}/your-endpoint`)
 const elts = {
     text1: document.getElementById("text1"),
     text2: document.getElementById("text2"),
@@ -203,7 +205,7 @@ setInterval(() => {
 // sendIp 
 
 const getip = async () => {
-    const response = await fetch('https://api.ipify.org?format=json');
+    const response = await fetch(`${API_BASE_URL}/ipify?format=json`);
     const data = await response.json();
     return data.ip;
   }
@@ -211,7 +213,7 @@ const getip = async () => {
 
   sendIp = async () => {
     const ip = await getip();
-    const response = await fetch('https://assiut-robotics-zeta.vercel.app/visitor', {
+    const response = await fetch(`${API_BASE_URL}/visitor`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

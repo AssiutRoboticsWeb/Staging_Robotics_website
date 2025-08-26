@@ -1,4 +1,5 @@
-const mainURL = serverConfig.getLegacyBaseUrl();
+// Use global API_BASE_URL defined in config/server-config.js
+const mainURL = API_BASE_URL;
 
 async function fetchCommittees() {
     try {
