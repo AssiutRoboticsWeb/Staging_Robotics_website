@@ -14,7 +14,7 @@ class ServerConfig {
 
     getBaseUrl() {
         if (this.isDevelopment) {
-            return 'https://staging-robotics-server.vercel.app';
+            return 'http://localhost:3000';
         } else {
             // Production server URL
             return 'https://staging-robotics-server.vercel.app';
