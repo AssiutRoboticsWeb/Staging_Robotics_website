@@ -1,11 +1,7 @@
 let step = 0;
 let email;
 let code;
-let urls = [
-    `${API_BASE_URL}/members/generateOTP`,
-    `${API_BASE_URL}/members/verifyOTP`,
-    `${API_BASE_URL}/members/changePassword`
-];
+let urls = ["https://assiut-robotics-zeta.vercel.app/members/generateOTP", "https://assiut-robotics-zeta.vercel.app/members/verifyOTP", "https://assiut-robotics-zeta.vercel.app/members/changePassword"];
    
 let errorMessagesP = document.getElementsByTagName("p")[0];
 
