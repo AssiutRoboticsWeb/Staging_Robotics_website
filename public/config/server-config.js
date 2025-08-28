@@ -3,7 +3,7 @@
 // Server Configuration for Production Only
 class ServerConfig {
     constructor() {
-        this.baseUrl = 'https://staging-robotics-server.vercel.app';
+        this.baseUrl = 'https://assiut-robotics-server.vercel.app';
     }
 
     // Helper method to build full API URLs

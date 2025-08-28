@@ -41,48 +41,67 @@ const notificationCount = document.getElementById("notificationCount");
 const history = document.getElementById("HistoryTasksList");
 // Related links
 const Links = {
-  general:[[{ name: "Meeting vote", link: "../meeting/vote.html" },{ name: "Components", link: "../OC_page/component.html" }]] ,
-  HR: [
-    [{ name: "HR page", link: "../control-panel/addHrTocommittee.html" }],
-  ],
-  web: [],
-  media: [
-    [{ name: "Make blog", link: "../blog/add-blog.html" }],
-  ],
-  OC: [
-    [
-      { name: "Components management page", link: "../OC_page/OC.html" },
-     ],
-  ],
-  PR: [[]],
-  "AC Electric": [[]],
-  "AC Mechanical": [
-    [],
-  ],
-  head: [
-    [
+  general: {
+    member: [
+      { name: "Meeting vote", link: "../meeting/vote.html" },
+      { name: "Components", link: "../OC_page/component.html" }
+    ],
+    head: []
+  },
+  HR: {
+    member: [
+      { name: "HR page", link: "../control-panel/addHrTocommittee.html" }
+    ],
+    head: []
+  },
+  web: {
+    member: [],
+    head: []
+  },
+  media: {
+    member: [
+      { name: "Make blog", link: "../blog/add-blog.html" }
+    ],
+    head: []
+  },
+  OC: {
+    member: [
+      { name: "Components management page", link: "../OC_page/OC.html" }
+    ],
+    head: []
+  },
+  PR: {
+    member: [],
+    head: []
+  },
+  "AC Electric": {
+    member: [],
+    head: []
+  },
+  "AC Mechanical": {
+    member: [],
+    head: []
+  },
+  head: {
+    member: [],
+    head: [
       { name: "Task manager", link: "../head/index.html" },
       { name: "Tracks manager", link: "../Tracks/adminDashboard/index.html" },
-     // { name: "members", link: "../leader/index.html" },
-    //  { name: "Meeting vote", link: "../meeting/vote.html" },
+      // { name: "members", link: "../leader/index.html" },
+      // { name: "Meeting vote", link: "../meeting/vote.html" },
       { name: "Leader page", link: "../leader/index.html" },
-      { name: "Create meeting", link: "../meeting/addMeeting.html" },
-    ],
-    [],
-  ],
-  leader: [
-    [
-    //   { name: "HR page", link: "../control-panel/addHrTocommittee.html" },
-    //   { name: "Make blog", link: "../blog/add-blog.html" },
-    //   { name: "Components management page", link: "../OC_page/OC.html" },
-    //   { name: "Task manager", link: "../head/index.html" },
-    // //  { name: "Meeting vote", link: "../meeting/vote.html" },
+      { name: "Create meeting", link: "../meeting/addMeeting.html" }
+    ]
+  },
+  leader: {
+    member: [
       { name: "members", link: "../leader/index.html" },
-      { name: "Leader page", link: "../leader/index.html" },
-
+      { name: "Leader page", link: "../leader/index.html" }
     ],
-  ],
+    head: []
+  }
 };
+
 
 // Verify token
 async function verifyToken() {
@@ -122,7 +141,7 @@ async function verifyToken() {
     }
     return response.ok;
   } catch (error) {
-    console.error("Token verification failed:", error.message);
+    console.error( error.message);
     return false;
   }
 }
@@ -308,24 +327,35 @@ function renderMemberData(data) {
     headerButtons.appendChild(addDateBtn);
   }
 
-  for (const key in Links) {
-    if (data.committee === key) {
-      if (data.role === "head" || data.role === "vice") {
-        relatedLinks[key] = Links[key];
-      }
+   // Show committee links for the user's committee
+  if (Links[data.committee] && Array.isArray(Links[data.committee].member)) {
+    relatedLinks[data.committee] = [...Links[data.committee].member];
+    if (
+      (data.role === "head" || data.role === "vice") &&
+      Array.isArray(Links[data.committee].head)
+    ) {
+      relatedLinks[data.committee] = [
+        ...relatedLinks[data.committee],
+        ...Links[data.committee].head
+      ];
     }
   }
-  if (
-    data.role === "head" ||
-    data.role === "vice" ||
-    data.role.includes("HR ")
-  ) {
-    relatedLinks.head = Links.head;
+
+  // If head/vice, also show all head links (in addition to committee links)
+  if (data.role === "head" || data.role === "vice") {
+    if (Links.head && Array.isArray(Links.head.head)) {
+      relatedLinks.head = [...Links.head.head];
+    }
   }
+
+  // If leader/viceLeader, also show all leader links
   if (data.role === "leader" || data.role === "viceLeader") {
-    relatedLinks.key = Links.leader;
+    if (Links.leader && Array.isArray(Links.leader.member)) {
+      relatedLinks.leader = [...Links.leader.member];
+    }
   }
   console.log(relatedLinks);
+  
   renderRelatedLinks(relatedLinks);
   // renderTracks(data.startedTracks);
 }
@@ -464,26 +494,17 @@ function renderTasks(tasks) {
 }
 // render relatedLinks list
 function renderRelatedLinks(relatedLinks) {
-  // obj of arr of arr of objs
-  const relatedLinksList =
-    document.getElementById("related-links").firstElementChild;
+  const relatedLinksList = document.getElementById("related-links").firstElementChild;
   relatedLinksList.innerHTML = "";
-  console.log("before fill");
-  
-  for (const key in relatedLinks) {
-    
-    relatedLinks[key].forEach((link, index) => {
-      console.log(link);
-      relatedLinks[key][index].forEach((link, index) => {
-        const component = `
-          <li name = "${link.name}"><a href="${link.link}">${link.name}</a></li>
-        `;
-        relatedLinksList.innerHTML += component;
-      });
-    });
-  }
-  console.log("after fill");
-
+    for (const key in relatedLinks) {
+      if (Array.isArray(relatedLinks[key])) {
+        for (const link of relatedLinks[key]) {
+          if (link && link.name && link.link) {
+            relatedLinksList.innerHTML += `<li name="${link.name}"><a href="${link.link}">${link.name}</a></li>`;
+          }
+        }
+      }
+    }
 }
 // RelatedLinks btn
 function RelatedLinks() {

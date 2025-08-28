@@ -240,7 +240,7 @@ async function approveMember(name,email, accepted) {
         console.log(email,accepted);
         
     const token=window.localStorage.getItem('token')
-    const res=await fetch(`https://assiut-robotics-zeta.vercel.app/members/confirm`, {
+    const res=await fetch(`${mainURL}/members/confirm`, {
         method: 'POST',
         headers: {
              'Content-Type': 'application/json',
@@ -269,7 +269,7 @@ async function setHead(memberId) {
     const token=window.localStorage.getItem('token')
 
     try{
-    const res=await fetch(`https://assiut-robotics-zeta.vercel.app/members/changeHead`, {
+    const res=await fetch(`${mainURL}/members/changeHead`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -291,7 +291,7 @@ async function setVice(memberId) {
     const token=window.localStorage.getItem('token')
 
     try{
-    const res=await fetch(`https://assiut-robotics-server.vercel.app/members/changeVice`, {
+    const res=await fetch(`${mainURL}/members/changeVice`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
