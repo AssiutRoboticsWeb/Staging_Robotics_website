@@ -3,7 +3,7 @@
 // Server Configuration for Production Only
 class ServerConfig {
     constructor() {
-        this.baseUrl = 'https://assiut-robotics-server.vercel.app';
+        this.baseUrl = 'http://localhost:3000';
     }
 
     // Helper method to build full API URLs

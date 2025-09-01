@@ -1,3 +1,8 @@
+import Loader  from "../../utiles/loader.js";
+
+const baseUrl = API_BASE_URL; // from server-config.js
+console.log(baseUrl);
+
 // DOM Elements
 const navToggle = document.getElementById('navToggle');
 const navMenu = document.getElementById('navMenu');
@@ -85,8 +90,16 @@ navMenu.addEventListener('click', (e) => {
 // Fetch and display members
 async function fetchMembers() {
     try {
-        const response = await fetch(`https://assiut-robotics-zeta.vercel.app/members/get/${committee }`);
+        const response = await fetch(`${baseUrl}/members/get/${committee }`);
         const data = await response.json();
+        Toastify({
+            text: "Members fetched successfully",
+            duration: 3000,
+            close: true,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "#4CAF50",
+        }).showToast();
         members = data.date;
         console.log(members);
         
@@ -99,12 +112,22 @@ async function fetchMembers() {
         });
         
         // Populate members grid for task assignment
-        membersGrid.innerHTML = members.map(member => `
+        // Add "Select All" checkbox
+        membersGrid.innerHTML = `
+            ${members.map(member => `
             <div class="member-checkbox">
                 <input type="checkbox" id="member-${member._id}" value="${member._id}">
                 <label for="member-${member._id}">${member.name}</label>
             </div>
-        `).join('');
+            `).join('')}
+        `;
+
+        // Add event listener for "Select All"
+        const selectAllBox = document.getElementById('selectAllMembers');
+        selectAllBox.addEventListener('change', function () {
+            const checkboxes = membersGrid.querySelectorAll('input[type="checkbox"]:not(#selectAllMembers)');
+            checkboxes.forEach(cb => cb.checked = selectAllBox.checked);
+        });
         
         // Fill HR Evaluation select with members
         fillMemberSelectOptions();
@@ -114,7 +137,14 @@ async function fetchMembers() {
         displayMembers();
     } catch (error) {
         console.log(error.message);
-        
+        Toastify({
+            text: "Error fetching members",
+            duration: 3000,
+            close: true,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "#f44336",
+        }).showToast();
         console.error('Error fetching members:', error);
     }
 }
@@ -288,30 +318,30 @@ function createTaskElement(task, member) {
         </div>
         <div class="task-content">
             <div class="task-meta">
-                <div>Points: ${task.points}</div>
-                <div>start at :: ${new Date(task.startDate).toISOString().replace("T", " ").substring(0, 16) }</div>
-                <div>deadline :: ${new Date(task.deadline).toISOString().replace("T", " ").substring(0, 16)
-                   }</div>
+                <div>Points: ${typeof task.points !== "undefined" ? task.points : ""}</div>
+                <div>start at :: ${task.startDate ? new Date(task.startDate).toISOString().replace("T", " ").substring(0, 16) : ""}</div>
+                <div>deadline :: ${task.deadline ? new Date(task.deadline).toISOString().replace("T", " ").substring(0, 16) : ""}</div>
             </div>
-            <p>${task.description}</p>
-            <p>Head Percent: ${task.headPercent}%</p>
-            <p>DeadLinePercent: ${task.deadlinePercent}%</p>
+            <p>${typeof task.description !== "undefined" ? task.description : ""}</p>
+            <p>Head Percent: ${typeof task.headPercent !== "undefined" ? task.headPercent : ""}%</p>
+            <p>DeadLinePercent: ${typeof task.deadlinePercent !== "undefined" ? task.deadlinePercent : ""}%</p>
             ${task.submissionLink && task.submissionLink !== '*' ? `
-                <p>Submitted: ${new Date(task.submissionDate).toLocaleDateString('en-US', {
+                <p>Submitted: ${task.submissionDate ? new Date(task.submissionDate).toLocaleDateString('en-US', {
                     year: 'numeric',
                     month: 'numeric',
                     day: 'numeric',
                     hour: '2-digit',
                     minute: '2-digit'
-                })}</p>
+                }) : ""}</p>
                 <p><a href="${task.submissionLink}" target="_blank">View Submission</a></p>
-                <button id="${task.submissionFileId}">download Task solution </button> 
-               
-                <h5>Preview </h5>
-                <iframe src="https://drive.google.com/file/d/${task.submissionFileId}/preview" width="300" height="200"></iframe>
-                <p>head eval: ${task.headEvaluation } </p>
-                <p>dead line eval : ${task.deadlineEvaluation }</p>
-                <p>task rate : ${task.rate }</p>
+                ${task.submissionFileId && task.downloadSubmissionUrl ? `<button id="${task.submissionFileId}">download Task solution </button>` : ""}
+                ${task.submissionFileId ? `
+                    <h5>Preview </h5>
+                    <iframe src="https://drive.google.com/file/d/${task.submissionFileId}/preview" width="300" height="200"></iframe>
+                ` : ""}
+                <p>head eval: ${typeof task.headEvaluation !== "undefined" ? task.headEvaluation : ""} </p>
+                <p>dead line eval : ${typeof task.deadlineEvaluation !== "undefined" ? task.deadlineEvaluation : ""}</p>
+                <p>task rate : ${typeof task.rate !== "undefined" ? task.rate : ""}</p>
             ` : ''}
             <div class="task-actions">
                 ${
@@ -336,6 +366,7 @@ function createTaskElement(task, member) {
 }
 
 // Toggle task details
+window.toggleTaskDetails = toggleTaskDetails;
 function toggleTaskDetails(header) {
     const content = header.nextElementSibling;
     const parent = header.parentElement;
@@ -413,7 +444,8 @@ document.getElementById('taskForm').addEventListener('submit', async (e) => {
 
     try {
         const promises = assignedMembers.map(memberId => 
-            fetch(`https://assiut-robotics-zeta.vercel.app/members/${memberId}/addTask`, {
+        {
+          return  fetch(`${baseUrl}/members/${memberId}/addTask`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -421,20 +453,44 @@ document.getElementById('taskForm').addEventListener('submit', async (e) => {
                 },
                 body: JSON.stringify(formData)
             }).then(res => res.json())
-        );
+        });
 
         const results = await Promise.all(promises);
+        console.log(results);
+        
         const failures = results.filter(result => result.status === 'fail');
 
         if (failures.length > 0) {
-            alert(`Failed to add task to ${failures.length} members. ${failures[0].message}`);
+            Toastify({
+                text: `Failed to add task to ${failures.length} members. ${failures[0].message}`,
+                duration: 3000,
+                close: true,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "#f44336",
+            }).showToast();
         } else {
-            alert('Task(s) added successfully!');
+            Toastify({
+                text: 'Task(s) added successfully!',
+                duration: 3000,
+                close: true,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "#4CAF50",
+            }).showToast();
             e.target.reset();
             await fetchMembers();
         }
     } catch (error) {
-        alert('Error adding task: ' + error.message);
+        Toastify({
+            text: 'Error adding task: ' + error.message,
+            duration: 3000,
+            close: true,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "#f44336",
+        }).showToast();
+        console.error('Error adding task:', error);
     }
 });
 
@@ -496,7 +552,7 @@ async function deleteTask(memberId, taskId) {
     if (!confirm('Are you sure you want to delete this task?')) return;
 
     try {
-        const response = await fetch(`https://assiut-robotics-zeta.vercel.app/members/${memberId}/deleteTask/${taskId}`, {
+        const response = await fetch(`${baseUrl}/members/${memberId}/deleteTask/${taskId}`, {
             method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -506,18 +562,40 @@ async function deleteTask(memberId, taskId) {
         const data = await response.json();
         
         if (!response.ok) {
+            Toastify({
+                text: 'Error deleting task: ' + data.message,
+                duration: 3000,
+                close: true,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "#f44336",
+            }).showToast();
             throw new Error(data.message);
         }
 
-        alert('Task deleted successfully!');
+        Toastify({
+            text: 'Task deleted successfully!',
+            duration: 3000,
+            close: true,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "#4CAF50",
+        }).showToast();
         await fetchMembers();
     } catch (error) {
-        alert('Error deleting task: ' + error.message);
+        Toastify({
+            text: 'Error deleting task: ' + error.message,
+            duration: 3000,
+            close: true,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "#f44336",
+        }).showToast();
     }
 }
 
 // Rate Task
-async function rateTask(memberId, taskId) {
+window.rateTask = async function(memberId, taskId) {
     // const isHead = prompt('Are you the head enter 1  for head, enter 0  for HR');
     const rating = prompt('Enter rating (1-100):');
 
@@ -535,7 +613,7 @@ async function rateTask(memberId, taskId) {
     
     
     try {
-        const response = await fetch(`https://assiut-robotics-zeta.vercel.app/members/members/${memberId}/rateTask/${taskId}`, {
+        const response = await fetch(`${baseUrl}/members/${memberId}/rateTask/${taskId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -547,15 +625,34 @@ async function rateTask(memberId, taskId) {
         const data = await response.json();
         
         if (!response.ok) {
-            // alert('Error rating task: ' + error.message);
-
-            throw new Error(data.message);
+           Toastify({
+               text: 'Error rating task: ' + data.message,
+               duration: 3000,
+               close: true,
+               gravity: "top",
+               position: "right",
+               backgroundColor: "#f44336",
+           }).showToast();
+           throw new Error(data.message);
         }
-
-        alert('Task rated successfully!',data.message);
+        Toastify({
+            text: 'Task rated successfully!',
+            duration: 3000,
+            close: true,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "#4CAF50",
+        }).showToast();
         await fetchMembers();
     } catch (error) {
-        alert('Error rating task: ' + error.message);
+        Toastify({
+            text: 'Error rating task: ' + error.message,
+            duration: 3000,
+            close: true,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "#f44336",
+        }).showToast();
     }
 }
 
@@ -637,7 +734,7 @@ function openEditTaskPopup(task, memberId, taskId, member) {
 
 // Function to update the task
 async function editrequest(memberId,taskId,member){
-    fetch(` https://assiut-robotics-zeta.vercel.app/members/${memberId}/editTask/${taskId}`, {
+    fetch(`${baseUrl}/members/${memberId}/editTask/${taskId}`, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
@@ -648,18 +745,47 @@ async function editrequest(memberId,taskId,member){
         
     )
     .then(data => {
+        Toastify({
+            text: 'Task updated successfully!',
+            duration: 3000,
+            close: true,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "#4CAF50",
+        }).showToast();
         console.log('Success:', data);
         // displayTasks(member.tasks, memberId); // Refresh the task list
         if(data.message=='jwt expired'){
-            alert('you have to log in again your session ended')
+            Toastify({
+                text: 'Session expired. Please log in again.',
+                duration: 3000,
+                close: true,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "#f44336",
+            }).showToast();
             window.location.href='../login/login.html'
         }
-        alert(data.message);
+        Toastify({
+            text: data.message,
+            duration: 3000,
+            close: true,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "#f44336",
+        }).showToast();
         fetchMembers()
     }
 ).catch(error => {
         console.error('Error updating task:', error.message);
-        alert('Error updating task');
+        Toastify({
+            text: 'Error updating task: ' + error.message,
+            duration: 3000,
+            close: true,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "#f44336",
+        }).showToast();
     })
 }
 // Function to close the popup
@@ -744,19 +870,36 @@ async function fetchMembersForHr() {
     // console.log(hrCommitte);
     if(hrCommitte !="Not found"){
         try {
-      const response = await fetch(`https://assiut-robotics-zeta.vercel.app/members/get/${hrCommitte}`);
+      const response = await fetch(`${baseUrl}/members/get/${hrCommitte}`);
       const data = await response.json();
-      let members = data.date;
-  
-      // console.log(members);
-      let memberSelect = document.getElementById("memberId");
-      memberSelect.innerHTML = '<option value=""> Select Member</option>';
-      members.forEach(member => {
-        memberSelect.innerHTML += `<option value="${member._id}">${member.name}</option>`;
-      });
-  
+      if (response.ok) {
+            Toastify({
+                text: 'Members fetched successfully',
+                duration: 3000,
+                close: true,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "#4caf50",
+            }).showToast();
+          let members = data.date;
+
+          // console.log(members);
+          let memberSelect = document.getElementById("memberId");
+          memberSelect.innerHTML = '<option value=""> Select Member</option>';
+          members.forEach(member => {
+            memberSelect.innerHTML += `<option value="${member._id}">${member.name}</option>`;
+          });
+        }
     } catch (error) {
       console.error('Error fetching members:', error);
+      Toastify({
+          text: 'Error fetching members: ' + error.message,
+          duration: 3000,
+          close: true,
+          gravity: "top",
+          position: "right",
+          backgroundColor: "#f44336",
+      }).showToast();
     }
     }
   }
@@ -770,7 +913,7 @@ async function fetchMembersForHr() {
     const formData = {
       month: document.getElementById('month').value,
       memberId: document.getElementById('memberId').value,
-      socialScore: Number(document.getElementById('socialScore').value),
+      meetingScore: Number(document.getElementById('meetingScore').value),
       behaviorScore: Number(document.getElementById('behaviorScore').value),
       interactionScore: Number(document.getElementById('interactionScore').value)
     };
@@ -778,7 +921,7 @@ async function fetchMembersForHr() {
     // console.log(JSON.stringify(formData));
   
     try {
-      const response = await fetch('https://assiut-robotics-zeta.vercel.app/members/update-tasks-evaluation', {
+      const response = await fetch(`${baseUrl}/members/update-tasks-evaluation`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -787,6 +930,14 @@ async function fetchMembersForHr() {
       });
   
       if (response.ok) {
+        Toastify({
+            text: 'Evaluation submitted successfully',
+            duration: 3000,
+            close: true,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "#4caf50",
+        }).showToast();
         messageDiv.textContent = 'Evaluation submitted successfully';
         messageDiv.className = 'message success';
         e.target.reset();
@@ -798,6 +949,14 @@ async function fetchMembersForHr() {
         throw new Error('Error submitting evaluation');
       }
     } catch (error) {
+        Toastify({
+            text: 'Error submitting evaluation: ' + error.message,
+            duration: 3000,
+            close: true,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "#f44336",
+        }).showToast();
       messageDiv.textContent = 'Error submitting evaluation';
       messageDiv.className = 'message error';
     }

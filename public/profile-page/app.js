@@ -254,7 +254,7 @@ async function submitCurrentTask(data) {
     console.log(currentTaskId);
 
     const response = await fetch(
-      `https://assiut-robotics-zeta.vercel.app/members/submitMemberTask/${currentTaskId}`,
+      `${API_BASE_URL}/members/submitMemberTask/${currentTaskId}`,
       {
         method: "PUT",
         headers: {
