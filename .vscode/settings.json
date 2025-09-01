@@ -1,3 +1,4 @@
 {
-    "liveServer.settings.port": 5506
+    "liveServer.settings.port": 5506,
+    "idf.pythonInstallPath": "D:\\Education\\softwares\\Espressif\\tools\\idf-python\\3.11.2\\python.exe"
 }

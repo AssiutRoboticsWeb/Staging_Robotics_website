@@ -4,10 +4,8 @@ const path = require("path")
 
 const app = express();
 
-import Toastify from 'toastify-js'
-import "toastify-js/src/toastify.css"
 app.use("/", express.static(__dirname + "/public"));
 
 app.listen(5000, () => {
-    console.log("server is run and listen to port : ", `http://localhost:${5000}/`);
+    console.log("server is run and listen to port : ", `http://localhost:${5000}`);
 })

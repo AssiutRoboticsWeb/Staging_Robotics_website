@@ -1,4 +1,4 @@
-import Loader from "../../utiles/loader.js";
+import Loader from "../utiles/loader.js";
 
 // Loader.show(); 
 // setTimeout(() => Loader.hide(), 2000);

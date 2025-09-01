@@ -1,4 +1,5 @@
-import Loader  from "../../utiles/loader.js";
+
+import Loader  from "../utiles/loader.js";
 
 const baseUrl = API_BASE_URL; // from server-config.js
 console.log(baseUrl);
@@ -16,6 +17,8 @@ const pendingTasksList = document.getElementById('pendingTasks');
 const membersGrid = document.getElementById('membersGrid');
 const membersList = document.getElementById('membersList');
 
+// Global Variables
+let membersData = [];
 
 
 const adminData = JSON.parse(localStorage.getItem('data'));
@@ -90,8 +93,28 @@ navMenu.addEventListener('click', (e) => {
 // Fetch and display members
 async function fetchMembers() {
     try {
-        const response = await fetch(`${baseUrl}/members/get/${committee }`);
+        const response = await fetch(`${baseUrl}/members/get/${committee }`, {
+            method : "GET",
+            headers : {
+                authorization : "bearer " + token
+            }
+        });
         const data = await response.json();
+        console.log(data);
+        if(data.message == "token is required")
+        {
+            window.location.href = "../login/index.html"
+        }
+        if(!data.date){
+            Toastify({
+                text: "Error fetching members",
+                duration: 3000,
+                close: true,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "#f44336",
+            }).showToast();
+        }
         Toastify({
             text: "Members fetched successfully",
             duration: 3000,
@@ -101,6 +124,7 @@ async function fetchMembers() {
             backgroundColor: "#4CAF50",
         }).showToast();
         members = data.date;
+        membersData = members;
         console.log(members);
         
         // Populate member filter
@@ -137,14 +161,7 @@ async function fetchMembers() {
         displayMembers();
     } catch (error) {
         console.log(error.message);
-        Toastify({
-            text: "Error fetching members",
-            duration: 3000,
-            close: true,
-            gravity: "top",
-            position: "right",
-            backgroundColor: "#f44336",
-        }).showToast();
+        
         console.error('Error fetching members:', error);
     }
 }
@@ -195,6 +212,8 @@ function displayMembers() {
     // document.querySelector('#membersSection .container').innerHTML= '<h2>Team Members</h2>';
 
     // membersList.innerHTML = '<h2>Team Members</h2>';
+    console.log("display Member");
+    
     membersList.innerHTML='';
     members.forEach(member => {
         const memberCard = document.createElement('div');
@@ -202,20 +221,23 @@ function displayMembers() {
         
         memberCard.innerHTML = `
             <div class="member-info">
-                <img src="${member.avatar}" alt="${member.name}" class="member-avatar">
-                <div class="member-details">
-                    <h3>${member.name}</h3>
-                    <p class="member-role">${member.role}</p>
-                    <p class="member-email">${member.email}</p>
-                    <p class="member-committee">${member.committee}</p>
-                </div>
+            <img src="${member.avatar}" alt="${member.name}" class="member-avatar">
+            <div class="member-details">
+                <h3>${member.name}</h3>
+                <p class="member-role">${member.role}</p>
+                
+                <p class="member-email">${member.email}</p>
+                <p class="member-committee">${member.committee}</p>
+                <button class="warnings-btn" onclick="event.stopPropagation(); show_penalities('${member._id}', 'warning')">Warnings</button>
+                <button class="alerts-btn" onclick="event.stopPropagation(); show_penalities('${member._id}', 'alert')">Alerts</button>
+            </div>
             </div>
             <div class="member-tasks">
-                <h4>Tasks (${member.tasks.length})</h4>
-                <div class="task-summary">
-                    <span>Submitted: ${member.tasks.filter(t => t.submissionLink && t.submissionLink !== '*').length}</span>
-                    <span>Pending: ${member.tasks.filter(t => !t.submissionLink || t.submissionLink === '*').length}</span>
-                </div>
+            <h4>Tasks (${member.tasks.length})</h4>
+            <div class="task-summary">
+                <span>Submitted: ${member.tasks.filter(t => t.submissionLink && t.submissionLink !== '*').length}</span>
+                <span>Pending: ${member.tasks.filter(t => !t.submissionLink || t.submissionLink === '*').length}</span>
+            </div>
             </div>
             <div class="member-status-indicator"></div>
         `;
@@ -250,28 +272,183 @@ function displayMembers() {
 }
 // =================================================================================================================
 
-
-//  =======================================
-function showMemberTasks(member) {
-    const tasksContainer = document.createElement('div');
-    tasksContainer.className = 'member-tasks-container';
-    
-    member.tasks.forEach(task => {
-        tasksContainer.appendChild(createTaskElement(task, member));
-    });
-    
-    // إضافة زر الإغلاق
-    tasksContainer.innerHTML += `
-        <button class="close-tasks-btn" onclick="this.parentElement.remove()">
-            &times;
-        </button>
+window.show_penalities = function(member , type){
+    const memberData = membersData.find(m => m._id === member);
+    console.log(memberData)
+    if (memberData) {
+        const penalties = (type == "warning") ? memberData.warnings || [] : memberData.alerts || [];
+        // Display penalties to the user
+        console.log("Penalties:", penalties);
+    showPenaltiesModal(penalties,type,memberData._id);
+    }
+}
+window.showPenaltiesModal = function(penalties,type,memberId){
+    console.log("showPenaltiesModal",penalties);
+    const modal = document.createElement('div');
+    modal.className = 'penalties-modal';
+    modal.innerHTML = `
+        <div class="penalties-modal-overlay">
+            <div class="penalties-modal-content">
+                <div class="penalties-header">
+                    <button type="button" aria-label="Close" class="close_penalties"
+                    onclick="this.closest('.penalties-modal').remove()">×</button>
+                    <button class = "add_penalties" onclick="addPenalty('${memberId}', '${type}')">add ${type}</button>
+                    <h3 style="margin-bottom: 18px;" >${type}</h3>
+                </div>
+                <div>
+                    ${
+                        penalties.length > 0
+                        ? `<div style="padding-left:0; list-style:none; margin-bottom: 0;">
+                            ${penalties.map(p => `
+                                <div class = "penalty-item">
+                               <button class = "remove_penalties" onclick="removePenalty('${memberId}', '${type}', '${p._id}')">remove ${type}</button>
+                                <h4>${p.header}</h4>
+                                <p>${p.date ? new Date(p.date).toLocaleDateString() : ''}</p>
+                                <p>${p.body}</p>
+                                <a href="${p.link}">link</a>
+                                
+                                </div>`).join('')}
+                           </div>`
+                        : `<p style="color:#888;">No penalties found.</p>`
+                    }
+                </div>
+            </div>
+        </div>
     `;
-    
-    document.body.appendChild(tasksContainer);
+    document.body.appendChild(modal);
 }
 
+window.addPenalty = function(memberId, type) {
+    // Open a form to get penalty details and submit to server
+    const modal = document.createElement('div');
+    modal.className = 'penalty-add-modal';
+    modal.innerHTML = `
+        <div class="penalties-modal-overlay">
+            <div class="penalties-modal-content">
+                <div class="penalties-header">
+                    <button type="button" aria-label="Close" class="close_penalties"
+                    onclick="this.closest('.penalty-add-modal').remove()">×</button>
+                    <h3>Add ${type.charAt(0).toUpperCase() + type.slice(1)}</h3>
+                </div>
+                <form id="addPenaltyForm" >
+                    <label>
+                        Date:
+                        <input type="date" name="date" required>
+                    </label>
+                    <br>
+                    <label>
+                        Header:
+                        <input type="text" name="header" required>
+                    </label>
+                    <br>
+                    <label>
+                        Body:
+                        <textarea name="body" required></textarea>
+                    </label>
+                    <br>
+                    <label>
+                        Link:
+                        <input type="url" name="link" placeholder="https://example.com/details">
+                    </label>
+                    <button type="submit">Add</button>
+                </form>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
 
+    document.getElementById('addPenaltyForm').onsubmit = async function(e) {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const penalty = {
+            addDate: formData.get('date'),
+            type,
+            header: formData.get('header'),
+            body: formData.get('body'),
+            link: formData.get('link')
+        };
+        try {
+            const response = await fetch(`${baseUrl}/members/addWarningAlert/${memberId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(penalty)
+            });
+            const data = await response.json();
+            if (response.ok) {
+                Toastify({
+                    text: 'Penalty added successfully!',
+                    duration: 3000,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: "#4CAF50",
+                }).showToast();
+                console.log(data);
+                
+                modal.remove();
+                await fetchMembers();
+            } else {
+                throw new Error(data.message || 'Error adding penalty');
+            }
+        } catch (err) {
+            Toastify({
+                text: 'Error adding penalty: ' + err.message,
+                duration: 3000,
+                close: true,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "#f44336",
+            }).showToast();
+            console.log(err);
+            
+        }
+    };
+}
 
+window.removePenalty = function(memberId, type, penaltyId) {
+    fetch(`${baseUrl}/members/removeWarningAlert/${memberId}/${penaltyId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ type })
+    }).then(res => res.json()).then((res) => {
+        console.log(res)
+        if(res.status != 200) {
+            Toastify({
+                text: 'Error removing penalty: ' + (res.message || 'Unknown error'),
+                duration: 3000,
+                close: true,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "#f44336",
+            }).showToast();
+        } else {
+            Toastify({
+                text: 'Penalty removed successfully!',
+                duration: 3000,
+                close: true,
+                gravity: "top",
+            position: "right",
+            backgroundColor: "#4CAF50",
+        }).showToast();
+        }
+    }).catch(err => {
+        console.error(err);
+        Toastify({
+            text: 'Error removing penalty: ' + err.message,
+            duration: 3000,
+            close: true,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "#f44336",
+        }).showToast();
+    })
+}
 
 
 // =============================
@@ -308,8 +485,8 @@ function addEvent(id,URL){
 function createTaskElement(task, member) {
     const div = document.createElement('div');
     div.className = `task-card ${task.submissionLink && task.submissionLink !== '*' ? 'submitted' : 'pending'}`;
-    console.log("task:",task);
-    
+    console.log("task:",task,task.submissionLink && task.submissionLink !== '*' ? 'submitted' : 'pending');
+
     div.innerHTML = `
         <div class="task-header" onclick="toggleTaskDetails(this)">
             <h3>${task.title}</h3>
@@ -548,7 +725,7 @@ document.getElementById('taskForm').addEventListener('submit', async (e) => {
 // }
 
 // Delete Task
-async function deleteTask(memberId, taskId) {
+window.deleteTask = async function deleteTask(memberId, taskId) {
     if (!confirm('Are you sure you want to delete this task?')) return;
 
     try {
@@ -581,7 +758,7 @@ async function deleteTask(memberId, taskId) {
             position: "right",
             backgroundColor: "#4CAF50",
         }).showToast();
-        await fetchMembers();
+        await fetchMembers  ();
     } catch (error) {
         Toastify({
             text: 'Error deleting task: ' + error.message,
