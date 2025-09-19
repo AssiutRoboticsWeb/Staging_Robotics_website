@@ -32,7 +32,7 @@ try {
             console.log('aaa', JSONresponse);
             window.localStorage.setItem('token', JSONresponse.data.token);
             document.querySelector(".message").innerHTML = JSONresponse.message;
-            window.location.href = document.referrer || '/';
+            window.location.href = document.referrer || '../profile-page/index.html';
         }
 
 
