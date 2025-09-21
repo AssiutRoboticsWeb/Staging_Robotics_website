@@ -39,14 +39,15 @@ const overlay = document.getElementById("overlay");
 
 const relatedLinksBtn = document.getElementById("RelatedLinks");
 const relatedLinksBox = document.getElementById("related-links");
+const rlClose = document.getElementById("rl-close");
 const rlCategory = document.getElementById("rl-category");
-const rlLink = document.getElementById("rl-link");
+const rlCards = document.getElementById("rl-cards");
 
 const currentTasksList = document.getElementById("CurrentTasksList");
 const historyTasksList = document.getElementById("HistoryTasksList");
 
 // ---------------------- Links Dictionary (base) ----------------------
-// وضعنا category لكل رابط لفرزه داخل الـ Select حسب التصنيف
+// وضعنا category لكل رابط لفرزه داخل الكروت حسب التصنيف المحدد في الـ Select
 const Links = {
   general: {
     member: [
@@ -167,12 +168,12 @@ function renderMemberData(data) {
 
   // Build categorized links
   const categorized = buildCategorizedLinks(data);
-  renderRelatedLinksSelects(categorized);
+  renderRelatedLinksUI(categorized);
 }
 
 // ---------------------- Build categorized links ----------------------
 function buildCategorizedLinks(user) {
-  // Order ثابت للتصنيفات
+  // ترتيب ثابت للتصنيفات
   const cats = {
     General: [],
     Meetings: [],
@@ -216,11 +217,12 @@ function pushByCat(cats, linkObj) {
   cats[cat].push(linkObj);
 }
 
-// ---------------------- UI: Select-based Related Links ----------------------
-function renderRelatedLinksSelects(cats) {
-  // Fill category select with counts
-  const entries = Object.entries(cats); // [[cat, arr], ...]
+// ---------------------- UI: Select + Cards ----------------------
+function renderRelatedLinksUI(cats) {
+  // املأ الـ select بالتصنيفات مع عدد الروابط
   rlCategory.innerHTML = "";
+  const entries = Object.entries(cats);
+
   entries.forEach(([cat, arr]) => {
     const opt = document.createElement("option");
     opt.value = cat;
@@ -229,53 +231,47 @@ function renderRelatedLinksSelects(cats) {
     rlCategory.appendChild(opt);
   });
 
-  // Select first non-empty category by default
   const firstAvailable = entries.find(([, arr]) => arr.length > 0)?.[0] || "General";
   rlCategory.value = firstAvailable;
 
-  // Fill links for selected category
-  const fillLinks = (category) => {
-    rlLink.innerHTML = "";
+  // دالة لعرض الكروت لتصنيف معين
+  const renderCardsFor = (category) => {
+    rlCards.innerHTML = "";
     const list = cats[category] || [];
     if (list.length === 0) {
-      const opt = document.createElement("option");
-      opt.value = "";
-      opt.textContent = "No links";
-      rlLink.appendChild(opt);
-      rlLink.disabled = true;
+      rlCards.innerHTML = `<div class="link-card" role="listitem" aria-disabled="true">
+        <i class="fas fa-circle-exclamation"></i><span>No links</span>
+      </div>`;
       return;
     }
-    rlLink.disabled = false;
-
-    // Placeholder to منع الفتح التلقائي حتى يختار المستخدم
-    const placeholder = document.createElement("option");
-    placeholder.value = "";
-    placeholder.textContent = "Select a link…";
-    placeholder.disabled = true;
-    placeholder.selected = true;
-    rlLink.appendChild(placeholder);
 
     list.forEach((l) => {
-      const opt = document.createElement("option");
-      opt.value = l.link;
-      opt.textContent = l.name;
-      rlLink.appendChild(opt);
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "link-card";
+      btn.setAttribute("role", "listitem");
+      btn.setAttribute("aria-label", `${l.name} (${category})`);
+      btn.innerHTML = `<i class="${iconForCategory(category)}"></i><span>${l.name}</span>`;
+      btn.addEventListener("click", () => {
+        if (l.link) window.open(l.link, "_blank");
+        closeRelatedLinksPopup();
+      });
+      rlCards.appendChild(btn);
     });
   };
 
-  fillLinks(firstAvailable);
+  renderCardsFor(firstAvailable);
+  rlCategory.onchange = (e) => renderCardsFor(e.target.value);
+}
 
-  rlCategory.onchange = (e) => {
-    fillLinks(e.target.value);
-  };
-
-  rlLink.onchange = () => {
-    const url = rlLink.value;
-    if (url) {
-      window.open(url, "_blank");
-      closeRelatedLinksPopup();
-    }
-  };
+function iconForCategory(cat) {
+  switch (cat) {
+    case "Meetings": return "fas fa-handshake";
+    case "Management": return "fas fa-gear";
+    case "Educational": return "fas fa-graduation-cap";
+    case "Committee": return "fas fa-users";
+    default: return "fas fa-link";
+  }
 }
 
 function setupRelatedLinksToggle() {
@@ -291,6 +287,8 @@ function setupRelatedLinksToggle() {
       closeRelatedLinksPopup();
     }
   });
+
+  rlClose.addEventListener("click", closeRelatedLinksPopup);
 }
 
 function closeRelatedLinksPopup() {
@@ -437,12 +435,13 @@ function renderCurrentTasks(tasks = []) {
         </div>
         <div class="task-deadline" style="${isDeadlinePassed ? "color:red;" : ""}">
           <i class="icon clock-icon"></i> Deadline ${deadline ? new Date(deadline).toLocaleDateString() : ""}
-          ${isDeadlinePassed && deadline
-        ? `<span style="color:red; font-size:.9em;">
+          ${
+            isDeadlinePassed && deadline
+              ? `<span style="color:red; font-size:.9em;">
                   (+${Math.floor((Date.now() - new Date(deadline)) / (1000 * 60 * 60 * 24))} days late)
                  </span>`
-        : ""
-      }
+              : ""
+          }
         </div>
       </div>
 
@@ -451,10 +450,11 @@ function renderCurrentTasks(tasks = []) {
 
       <div class="task-meta">
         <span class="task-points">Points: ${points ?? 0}</span>
-        ${headEvaluation > 0
-        ? `<span class="task-evaluation">Head Eval: ${headEvaluation}, deadline: ${deadlineEvaluation ?? ""}</span>`
-        : `<button class="submit-task-btn">Submit Task</button>`
-      }
+        ${
+          headEvaluation > 0
+            ? `<span class="task-evaluation">Head Eval: ${headEvaluation}, deadline: ${deadlineEvaluation ?? ""}</span>`
+            : `<button class="submit-task-btn">Submit Task</button>`
+        }
       </div>
     `;
 
@@ -620,10 +620,15 @@ function initialize() {
     loadNotifications();
   });
 
-  // Esc to close modal
+  // Esc to close modal or links popup
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && submitTaskModal.style.display === "block") {
-      submitTaskModal.style.display = "none";
+    if (e.key === "Escape") {
+      if (submitTaskModal.style.display === "block") {
+        submitTaskModal.style.display = "none";
+      }
+      if (!relatedLinksBox.classList.contains("disabled")) {
+        closeRelatedLinksPopup();
+      }
     }
   });
 }

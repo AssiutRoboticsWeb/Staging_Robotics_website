@@ -8,7 +8,8 @@
 
   <!-- Styles -->
   <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 
   <!-- Server config (provides API_BASE_URL) -->
   <script src="../config/server-config.js"></script>
@@ -36,15 +37,19 @@
         <!-- Lab Dates/Add Date buttons تُضاف برمجياً حسب الدور واللجنة -->
       </div>
 
-      <!-- Popup: Related Links as Selects (بدون زر) -->
+      <!-- Popup: Category select + link cards -->
       <div class="disabled" id="related-links" aria-hidden="true">
+        <div class="rl-header">
+          <h3>Quick Links</h3>
+          <button class="rl-close" id="rl-close" aria-label="Close links">&times;</button>
+        </div>
+
         <div class="rl-selects">
           <label for="rl-category">Category</label>
-          <select id="rl-category"></select>
-
-          <label for="rl-link">Link</label>
-          <select id="rl-link"></select>
+          <select id="rl-category" aria-label="Select a category"></select>
         </div>
+
+        <div id="rl-cards" class="links-grid" role="list" aria-label="Links"></div>
       </div>
 
       <div class="user-info">
