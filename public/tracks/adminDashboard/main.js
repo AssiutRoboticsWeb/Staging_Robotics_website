@@ -1,16 +1,9 @@
 // ================= Core Config =================
-// Use global API_BASE_URL defined in config/server-config.js
 const backendURL = (typeof API_BASE_URL !== "undefined" ? API_BASE_URL : "") + "/";
+const MEMBERS_API = "http://localhost:3000/members/get/web";
 
-// Mock directory (replace with backend later if needed)
-const membersDirectory = [
-  { id: "u1", name: "Ahmed Oraby Mohamed", email: "ahmedoraby1233@gmail.com", avatar: "https://i.pravatar.cc/40?img=11", roles: ["member","manager"] },
-  { id: "u2", name: "Mazen Magdy",          email: "mm1759467@gmail.com",     avatar: "https://i.pravatar.cc/40?img=22", roles: ["head","web"] },
-  { id: "u3", name: "Ahmed Eid",             email: "ahmed.eid.almady@gmail.com", avatar: "https://i.pravatar.cc/40?img=33", roles: ["leader","manager"] },
-  { id: "u4", name: "Renad Radwan",          email: "renad.radwan@gmail.com",  avatar: "https://i.pravatar.cc/40?img=44", roles: ["member"] },
-];
-
-// ================= Seed / Local State =================
+// ================= State =================
+let membersDirectory = []; // filled from API
 let electricData = {
   tracks: [
     {
@@ -18,18 +11,18 @@ let electricData = {
       name: "Embedded",
       icon: "<i class='fa fa-microchip icon'></i>",
       description: "كل ما يخص الأنظمة المدمجة.",
-      admins: [membersDirectory[2], membersDirectory[1]],
       courses: [
         {
           name: "Intro to Embedded",
           description: "مقدمة عن الأنظمة المدمجة.",
+          admins: [], // will be selectable from API
           tasks: [
             { name: "Blink LED", description: "برمجة دائرة لجعل LED تضيء وتطفئ.", link: "https://example.com/blink", deadline: "2025-10-01" }
           ]
         }
       ]
     },
-    { _id: "local-hw", name: "Hardware", icon: "<i class='fa fa-cogs icon'></i>", description: "كل ما يخص الهاردوير.", admins: [], courses: [] }
+    { _id: "local-hw", name: "Hardware", icon: "<i class='fa fa-cogs icon'></i>", description: "كل ما يخص الهاردوير.", courses: [] }
   ]
 };
 
@@ -66,7 +59,29 @@ function showNotification(msg, type = "success") {
   setTimeout(() => notif.remove(), 2000);
 }
 
-// ================= Backend =================
+// ================= Members (API) =================
+async function loadMembers() {
+  try {
+    const res = await fetch(MEMBERS_API, { headers: { "Accept": "application/json" } });
+    if (!res.ok) throw new Error("Failed members API");
+    const data = await res.json();
+
+    // توقع أن الـAPI بيرجع List من الأعضاء، نوحّدها للشكل المطلوب
+    membersDirectory = (Array.isArray(data?.data) ? data.data : Array.isArray(data) ? data : []).map(m => ({
+      id: m.id || m._id || m.userId || String(m.email || m.name),
+      name: m.name || `${m.firstName || ""} ${m.lastName || ""}`.trim() || m.username || "Member",
+      email: m.email || "",
+      avatar: m.avatar || m.image || "https://i.pravatar.cc/40",
+      roles: Array.isArray(m.roles) ? m.roles : (m.role ? [m.role] : [])
+    }));
+  } catch (e) {
+    console.error(e);
+    showNotification("Members API failed. Using empty list.", "error");
+    membersDirectory = [];
+  }
+}
+
+// ================= Backend Tracks =================
 function getTrack() {
   fetch(`${backendURL}tracks`, {
     method: "GET",
@@ -75,8 +90,10 @@ function getTrack() {
     .then((r) => { if (r.status === 401) { window.location.href = "../../login/login.html"; return; } return r.json(); })
     .then((data) => {
       if (data && data.data) {
-        // ensure admins array always exists
-        electricData.tracks = data.data.map((t) => ({ ...t, admins: Array.isArray(t.admins) ? t.admins : [] }));
+        electricData.tracks = data.data.map((t) => ({
+          ...t,
+          courses: (t.courses || []).map(c => ({ ...c, admins: Array.isArray(c.admins) ? c.admins : [] }))
+        }));
       }
       renderTracks();
     })
@@ -108,17 +125,6 @@ function renderTracks() {
   coreSection.innerHTML = "";
 
   electricData.tracks.forEach((track, idx) => {
-    const admins = Array.isArray(track.admins) ? track.admins : [];
-    const adminsChips =
-      admins.length === 0
-        ? `<span class="muted">No admins</span>`
-        : admins.slice(0, 3).map(a => `
-            <span class="chip chip-sm">
-              <img src="${a.avatar || "https://i.pravatar.cc/40"}" alt="${a.name}">
-              <span class="chip-text">${a.name.split(" ")[0]}</span>
-            </span>
-          `).join("") + (admins.length > 3 ? `<span class="chip-more">+${admins.length - 3}</span>` : "");
-
     const card = document.createElement("div");
     card.className = "card";
     card.style.position = "relative";
@@ -127,12 +133,6 @@ function renderTracks() {
       ${track.icon || ""}
       <h3>${track.name}</h3>
       <p>${track.description || ""}</p>
-
-      <div class="admins-inline">
-        <span class="admins-title">Admins:</span>
-        <div class="admins-chips">${adminsChips}</div>
-      </div>
-
       <div class="card-actions">
         <span class="edit-btn" title="Edit"><i class="fa fa-edit"></i></span>
         <span class="delete-btn" title="Delete"><i class="fa fa-trash"></i></span>
@@ -191,7 +191,9 @@ function renderCourses(trackIdx) {
   })
     .then((r) => { if (r.status === 401) { window.location.href = "../../login/login.html"; return; } return r.json(); })
     .then((data) => {
-      if (Array.isArray(data?.data)) track.courses = data.data;
+      if (Array.isArray(data?.data)) {
+        track.courses = data.data.map(c => ({ ...c, admins: Array.isArray(c.admins) ? c.admins : [] }));
+      }
       drawCourses(track, trackIdx);
     })
     .catch(() => { showNotification("Failed to fetch courses","error"); drawCourses(track, trackIdx); });
@@ -207,11 +209,28 @@ function drawCourses(track, trackIdx) {
   }
 
   track.courses.forEach((course, idx) => {
+    const admins = Array.isArray(course.admins) ? course.admins : [];
+    const adminsChips =
+      admins.length === 0
+        ? `<span class="muted">No admins</span>`
+        : admins.slice(0, 3).map(a => `
+            <span class="chip chip-sm">
+              <img src="${a.avatar || "https://i.pravatar.cc/40"}" alt="${a.name}">
+              <span class="chip-text">${a.name?.split(" ")[0] || "Admin"}</span>
+            </span>
+          `).join("") + (admins.length > 3 ? `<span class="chip-more">+${admins.length - 3}</span>` : "");
+
     const card = document.createElement("div");
     card.className = "card";
     card.innerHTML = `
       <h3>${course.name}</h3>
       <p>${course.description || ""}</p>
+
+      <div class="admins-inline">
+        <span class="admins-title">Admins:</span>
+        <div class="admins-chips">${adminsChips}</div>
+      </div>
+
       <div class="card-actions">
         <span class="edit-btn" title="Edit"><i class="fa fa-edit"></i></span>
         <span class="delete-btn" title="Delete"><i class="fa fa-trash"></i></span>
@@ -353,28 +372,19 @@ function setModalTitleByType(type, isEdit) {
   modalTitle.textContent = map[type] || "Modal";
 }
 
-// --- Icon Picker (with custom HTML option) ---
+// Icons
 const FA_ICON_OPTIONS = [
-  "fa-microchip", "fa-cogs", "fa-robot", "fa-bolt", "fa-microphone-lines",
-  "fa-code", "fa-diagram-project", "fa-screwdriver-wrench", "fa-flask", "fa-wave-square"
+  "fa-microchip","fa-cogs","fa-robot","fa-bolt","fa-microphone-lines",
+  "fa-code","fa-diagram-project","fa-screwdriver-wrench","fa-flask","fa-wave-square"
 ];
-function iconHTMLFromChoice(choice) {
-  if (!choice) return "<i class='fa fa-microchip icon'></i>";
-  if (choice === "__custom__") return ""; // will use the custom input
-  return `<i class="fa ${choice} icon"></i>`;
-}
-
-function sanitizeHTMLIcon(input) {
-  // Very light allowlist: only <i> with fa classes.
-  const div = document.createElement("div");
-  div.innerHTML = input;
-  const i = div.querySelector("i");
-  if (!i) return "";
-  const cls = (i.getAttribute("class") || "").split(/\s+/).filter(c => c === "icon" || c.startsWith("fa")).join(" ");
+function iconHTMLFromChoice(choice){ if(!choice) return "<i class='fa fa-microchip icon'></i>"; if(choice==="__custom__") return ""; return `<i class="fa ${choice} icon"></i>`; }
+function sanitizeHTMLIcon(input){
+  const div=document.createElement("div"); div.innerHTML=input; const i=div.querySelector("i");
+  if(!i) return ""; const cls=(i.getAttribute("class")||"").split(/\s+/).filter(c=>c==="icon"||c.startsWith("fa")).join(" ");
   return `<i class="${cls}"></i>`;
 }
 
-function openModal(type, isEdit = false, indices = {}) {
+async function openModal(type, isEdit = false, indices = {}) {
   setModalTitleByType(type, isEdit);
 
   modal.classList.add("show");
@@ -388,10 +398,10 @@ function openModal(type, isEdit = false, indices = {}) {
   if (isEdit) {
     if (type === "track") {
       const t = electricData.tracks[indices.idx];
-      values = { name: t.name, icon: t.icon, description: t.description, admins: t.admins || [] };
+      values = { name: t.name, icon: t.icon, description: t.description };
     } else if (type === "course") {
       const c = electricData.tracks[selectedTrackIndex].courses[indices.idx];
-      values = { name: c.name, description: c.description };
+      values = { name: c.name, description: c.description, admins: c.admins || [] };
     } else if (type === "task") {
       const t = electricData.tracks[selectedTrackIndex].courses[selectedCourseIndex].tasks[indices.idx];
       values = { name: t.name, description: t.description, link: t.link || "", deadline: t.deadline || "" };
@@ -401,7 +411,142 @@ function openModal(type, isEdit = false, indices = {}) {
     }
   }
 
-  // Submit handler
+  // ===== Render modal fields =====
+  if (type === "track") {
+    const m = (values.icon || "").match(/fa\s+(fa-[\w-]+)/i);
+    const cls = m ? m[1] : null;
+    const resolvedIconChoice = cls && FA_ICON_OPTIONS.includes(cls) ? cls : "__custom__";
+    const initialCustomIcon = resolvedIconChoice === "__custom__" ? (values.icon || "<i class='fa fa-microchip icon'></i>") : "";
+
+    modalFields.innerHTML = `
+      <div class="grid-2">
+        <div>
+          <label for="track-name">Track Name</label>
+          <input id="track-name" required value="${values.name || ""}" maxlength="60" placeholder="e.g., Embedded Systems"/>
+
+          <label for="track-description">Description</label>
+          <textarea id="track-description" required maxlength="220" placeholder="Short, clear description">${values.description || ""}</textarea>
+        </div>
+
+        <div>
+          <label for="track-icon-choice">Icon</label>
+          <div class="icon-picker">
+            <select id="track-icon-choice">
+              ${FA_ICON_OPTIONS.map(c => `<option value="${c}" ${resolvedIconChoice===c?"selected":""}>${c.replace("fa-","")}</option>`).join("")}
+              <option value="__custom__" ${resolvedIconChoice==="__custom__"?"selected":""}>Custom &lt;i&gt; HTML</option>
+            </select>
+            <span id="icon-choice-preview" class="icon-choice-preview">${iconHTMLFromChoice(resolvedIconChoice)}</span>
+          </div>
+
+          <div id="custom-icon-wrap" class="${resolvedIconChoice==="__custom__"?"":"hidden"}">
+            <label for="track-icon-custom">Custom Icon HTML (safe &lt;i class="fa ..."&gt; only)</label>
+            <input id="track-icon-custom" value='${initialCustomIcon.replace(/'/g,"&apos;")}' placeholder="<i class='fa fa-microchip icon'></i>"/>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // preview (no admins for track)
+    modalPreview.hidden = false;
+    setupTrackLivePreview({
+      name: values.name || "",
+      description: values.description || "",
+      iconHTML: values.icon || "<i class='fa fa-microchip icon'></i>"
+    });
+    document.getElementById("preview-admins-wrap").style.display = "none";
+
+    // icon behavior
+    const choiceEl = document.getElementById("track-icon-choice");
+    const choicePreview = document.getElementById("icon-choice-preview");
+    const customWrap = document.getElementById("custom-icon-wrap");
+    const customInput = document.getElementById("track-icon-custom");
+    function applyIconPreview(){
+      const val=choiceEl.value;
+      if(val==="__custom__"){
+        customWrap.classList.remove("hidden");
+        choicePreview.innerHTML = sanitizeHTMLIcon(customInput.value.trim()) || "<i class='fa fa-circle-question'></i>";
+        updatePreviewIcon(choicePreview.innerHTML);
+      } else {
+        customWrap.classList.add("hidden");
+        const html = iconHTMLFromChoice(val);
+        choicePreview.innerHTML = html; updatePreviewIcon(html);
+      }
+    }
+    choiceEl.addEventListener("change", applyIconPreview);
+    customInput.addEventListener("input", applyIconPreview);
+
+    document.getElementById("track-name").addEventListener("input", (e)=>updatePreviewName(e.target.value));
+    document.getElementById("track-description").addEventListener("input", (e)=>updatePreviewDesc(e.target.value));
+  }
+
+  else if (type === "course") {
+    // Load members from API before building the picker
+    if (!Array.isArray(membersDirectory) || membersDirectory.length === 0) {
+      await loadMembers();
+    }
+    const initialAdminIds = (values.admins || []).map(a => a.id);
+
+    modalFields.innerHTML = `
+      <label for="course-name">Course Name</label>
+      <input id="course-name" required value="${values.name || ""}">
+      <label for="course-description">Description</label>
+      <textarea id="course-description" required>${values.description || ""}</textarea>
+
+      <!-- Admins Picker (COURSE) -->
+      <div class="admins-picker">
+        <div class="admins-header"><h4>الأعضاء المختارِين (Admins)</h4></div>
+        <div id="admins-selected" class="chips-wrap"></div>
+        <label for="admins-search" class="admins-label">اختر الأعضاء</label>
+        <input id="admins-search" class="admins-search" type="text" placeholder="ابحث عن عضو..."/>
+        <div id="admins-list" class="admins-list" tabindex="0"></div>
+      </div>
+    `;
+
+    // preview (with admins)
+    modalPreview.hidden = false;
+    document.getElementById("preview-admins-wrap").style.display = "flex";
+    setupCourseLivePreview({
+      name: values.name || "",
+      description: values.description || "",
+      adminIds: initialAdminIds
+    });
+
+    // build admins UI and ensure scroll goes to bottom if needed
+    buildAdminsUI(initialAdminIds, /*updatePreview*/ true);
+
+    // live typing preview
+    document.getElementById("course-name").addEventListener("input", (e)=>updatePreviewName(e.target.value));
+    document.getElementById("course-description").addEventListener("input", (e)=>updatePreviewDesc(e.target.value));
+  }
+
+  else if (type === "task") {
+    modalPreview.hidden = true;
+    modalFields.innerHTML = `
+      <label for="task-name">Task Name</label>
+      <input id="task-name" required value="${values.name || ""}">
+      <label for="task-description">Description</label>
+      <textarea id="task-description" required>${values.description || ""}</textarea>
+      <label for="task-link">Task Link</label>
+      <input id="task-link" type="url" placeholder="https://..." value="${values.link || ""}">
+      <label for="task-deadline">Deadline</label>
+      <input id="task-deadline" type="date" value="${values.deadline || ""}">
+    `;
+  }
+
+  else if (type === "announceTrack") {
+    modalPreview.hidden = true;
+    const options = (electricData.tracks || []).map(t => `<option value="${t.name}">${t.name}</option>`).join("");
+    modalFields.innerHTML = `
+      <label for="announce-track-name">Select Announcement Track</label>
+      <select name="announce-track-name" id="announce-track-name">${options}</select>
+      <label for="announce-track-description">Description</label>
+      <textarea id="announce-track-description" required>${values.description || ""}</textarea>
+      <label for="announce-track-content">Announcement content</label>
+      <textarea id="announce-track-content" required>${values.content || ""}</textarea>
+    `;
+  }
+
+  // ===== Submit =====
   modalForm.onsubmit = (e) => {
     e.preventDefault();
     const errorsEl = document.getElementById("form-errors");
@@ -411,40 +556,29 @@ function openModal(type, isEdit = false, indices = {}) {
       const name = document.getElementById("track-name").value.trim();
       const description = document.getElementById("track-description").value.trim();
 
-      // icon resolution
       const iconChoice = document.getElementById("track-icon-choice").value;
       let iconHTML = iconHTMLFromChoice(iconChoice);
       if (iconChoice === "__custom__") {
         iconHTML = sanitizeHTMLIcon(document.getElementById("track-icon-custom").value.trim());
       }
 
-      const adminsSelectedIds = Array.from(document.querySelectorAll(".admin-checkbox:checked")).map(cb => cb.value);
-      const selectedAdmins = membersDirectory.filter(m => adminsSelectedIds.includes(m.id));
-
-      // basic validation
       const errs = [];
       if (!name) errs.push("Track name is required.");
       if (!description) errs.push("Description is required.");
       if (iconChoice === "__custom__" && !iconHTML) errs.push("Custom icon HTML is invalid.");
-
-      if (errs.length) {
-        errorsEl.textContent = errs.join(" ");
-        return;
-      }
+      if (errs.length) { errorsEl.textContent = errs.join(" "); return; }
 
       if (editMode) {
         const t = electricData.tracks[editIndices.idx];
-        t.name = name; t.description = description; t.admins = selectedAdmins; t.icon = iconHTML || t.icon;
-
-        // optimistic PUT
+        t.name = name; t.description = description; t.icon = iconHTML || t.icon;
         fetch(`${backendURL}tracks/${t._id || editIndices.idx}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("token")}` },
-          body: JSON.stringify({ name, description, admins: selectedAdmins, icon: t.icon })
+          body: JSON.stringify({ name, description, icon: t.icon })
         }).catch(()=>{});
         showNotification("Track updated","success");
       } else {
-        const payload = { name, description, admins: selectedAdmins, icon: iconHTML || "<i class='fa fa-microchip icon'></i>" };
+        const payload = { name, description, icon: iconHTML || "<i class='fa fa-microchip icon'></i>" };
         fetch(`${backendURL}tracks`, {
           method: "POST",
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("token")}` },
@@ -459,12 +593,21 @@ function openModal(type, isEdit = false, indices = {}) {
     else if (type === "course") {
       const name = document.getElementById("course-name").value.trim();
       const description = document.getElementById("course-description").value.trim();
+
+      const adminsSelectedIds = Array.from(document.querySelectorAll(".admin-checkbox:checked")).map(cb => cb.value);
+      const selectedAdmins = membersDirectory.filter(m => adminsSelectedIds.includes(m.id));
+
+      if (!name || !description) {
+        errorsEl.textContent = "Course name and description are required.";
+        return;
+      }
+
       if (editMode) {
         const c = electricData.tracks[selectedTrackIndex].courses[editIndices.idx];
-        c.name = name; c.description = description;
+        c.name = name; c.description = description; c.admins = selectedAdmins;
         showNotification("Course updated","success");
       } else {
-        electricData.tracks[selectedTrackIndex].courses.push({ name, description, tasks: [] });
+        electricData.tracks[selectedTrackIndex].courses.push({ name, description, admins: selectedAdmins, tasks: [] });
         showNotification("Course added","success");
       }
       renderCourses(selectedTrackIndex);
@@ -475,6 +618,7 @@ function openModal(type, isEdit = false, indices = {}) {
       const description = document.getElementById("task-description").value.trim();
       const link = document.getElementById("task-link").value.trim();
       const deadline = document.getElementById("task-deadline").value;
+      if (!name || !description) { errorsEl.textContent = "Task name and description are required."; return; }
       if (editMode) {
         const t = electricData.tracks[selectedTrackIndex].courses[selectedCourseIndex].tasks[editIndices.idx];
         t.name = name; t.description = description; t.link = link || ""; t.deadline = deadline || "";
@@ -512,151 +656,24 @@ function openModal(type, isEdit = false, indices = {}) {
     closeModal();
   };
 
-  // Render modal fields
-  if (type === "track") {
-    const initialAdminIds = (values.admins || []).map(a => a.id);
-    const resolvedIconChoice = (() => {
-      // try to map current HTML to a known fa class; else custom
-      const m = (values.icon || "").match(/fa\s+(fa-[\w-]+)/i);
-      const cls = m ? m[1] : null;
-      return cls && FA_ICON_OPTIONS.includes(cls) ? cls : "__custom__";
-    })();
-    const initialCustomIcon = resolvedIconChoice === "__custom__" ? (values.icon || "<i class='fa fa-microchip icon'></i>") : "";
-
-    modalFields.innerHTML = `
-      <div class="grid-2">
-        <div>
-          <label for="track-name">Track Name</label>
-          <input id="track-name" required value="${values.name || ""}" maxlength="60" placeholder="e.g., Embedded Systems"/>
-
-          <label for="track-description">Description</label>
-          <textarea id="track-description" required maxlength="220" placeholder="Short, clear description">${values.description || ""}</textarea>
-        </div>
-
-        <div>
-          <label for="track-icon-choice">Icon</label>
-          <div class="icon-picker">
-            <select id="track-icon-choice">
-              ${FA_ICON_OPTIONS.map(c => `<option value="${c}" ${resolvedIconChoice===c?"selected":""}>${c.replace("fa-","")}</option>`).join("")}
-              <option value="__custom__" ${resolvedIconChoice==="__custom__"?"selected":""}>Custom &lt;i&gt; HTML</option>
-            </select>
-            <span id="icon-choice-preview" class="icon-choice-preview">${iconHTMLFromChoice(resolvedIconChoice)}</span>
-          </div>
-
-          <div id="custom-icon-wrap" class="${resolvedIconChoice==="__custom__"?"":"hidden"}">
-            <label for="track-icon-custom">Custom Icon HTML (safe &lt;i class="fa ..."&gt; only)</label>
-            <input id="track-icon-custom" value='${initialCustomIcon.replace(/'/g,"&apos;")}' placeholder="<i class='fa fa-microchip icon'></i>"/>
-          </div>
-        </div>
-      </div>
-
-      <div class="admins-picker">
-        <div class="admins-header"><h4>الأعضاء المختارِين (Admins)</h4></div>
-        <div id="admins-selected" class="chips-wrap"></div>
-        <label for="admins-search" class="admins-label">اختر الأعضاء</label>
-        <input id="admins-search" class="admins-search" type="text" placeholder="ابحث عن عضو..."/>
-        <div id="admins-list" class="admins-list"></div>
-      </div>
-    `;
-
-    // enable preview panel for track
-    modalPreview.hidden = false;
-    setupTrackLivePreview({
-      name: values.name || "",
-      description: values.description || "",
-      iconHTML: values.icon || "<i class='fa fa-microchip icon'></i>",
-      adminIds: initialAdminIds
-    });
-
-    // icon picker behavior
-    const choiceEl = document.getElementById("track-icon-choice");
-    const choicePreview = document.getElementById("icon-choice-preview");
-    const customWrap = document.getElementById("custom-icon-wrap");
-    const customInput = document.getElementById("track-icon-custom");
-
-    function applyIconPreview() {
-      const val = choiceEl.value;
-      if (val === "__custom__") {
-        customWrap.classList.remove("hidden");
-        choicePreview.innerHTML = sanitizeHTMLIcon(customInput.value.trim()) || "<i class='fa fa-circle-question'></i>";
-        updatePreviewIcon(choicePreview.innerHTML);
-      } else {
-        customWrap.classList.add("hidden");
-        const html = iconHTMLFromChoice(val);
-        choicePreview.innerHTML = html;
-        updatePreviewIcon(html);
-      }
-    }
-
-    choiceEl.addEventListener("change", applyIconPreview);
-    customInput.addEventListener("input", applyIconPreview);
-
-    // build admins UI
-    buildAdminsUI(initialAdminIds, true);
-
-    // live typing preview
-    document.getElementById("track-name").addEventListener("input", (e)=>updatePreviewName(e.target.value));
-    document.getElementById("track-description").addEventListener("input", (e)=>updatePreviewDesc(e.target.value));
-  }
-  else if (type === "course") {
-    modalPreview.hidden = true;
-    modalFields.innerHTML = `
-      <label for="course-name">Course Name</label>
-      <input id="course-name" required value="${values.name || ""}">
-      <label for="course-description">Description</label>
-      <textarea id="course-description" required>${values.description || ""}</textarea>
-    `;
-  }
-  else if (type === "task") {
-    modalPreview.hidden = true;
-    modalFields.innerHTML = `
-      <label for="task-name">Task Name</label>
-      <input id="task-name" required value="${values.name || ""}">
-      <label for="task-description">Description</label>
-      <textarea id="task-description" required>${values.description || ""}</textarea>
-      <label for="task-link">Task Link</label>
-      <input id="task-link" type="url" placeholder="https://..." value="${values.link || ""}">
-      <label for="task-deadline">Deadline</label>
-      <input id="task-deadline" type="date" value="${values.deadline || ""}">
-    `;
-  }
-  else if (type === "announceTrack") {
-    modalPreview.hidden = true;
-    const options = (electricData.tracks || []).map(t => `<option value="${t.name}">${t.name}</option>`).join("");
-    modalFields.innerHTML = `
-      <label for="announce-track-name">Select Announcement Track</label>
-      <select name="announce-track-name" id="announce-track-name">${options}</select>
-      <label for="announce-track-description">Description</label>
-      <textarea id="announce-track-description" required>${values.description || ""}</textarea>
-      <label for="announce-track-content">Announcement content</label>
-      <textarea id="announce-track-content" required>${values.content || ""}</textarea>
-    `;
-  }
-
-  // Focus trap + start focus
+  // ===== focus trap + position =====
   requestAnimationFrame(() => {
-    const focusables = modalContent.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+    const focusables = modalContent.querySelectorAll('button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])');
     if (focusables.length) focusables[0].focus();
-
-    function onKeyDown(e) {
-      if (e.key === "Escape") { e.preventDefault(); closeModal(); }
-      else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") {
-        e.preventDefault();
-        modalForm.requestSubmit();
-      }
-      else if (e.key === "Tab") {
-        const f = Array.from(focusables).filter(el => !el.hasAttribute("disabled"));
-        if (f.length === 0) return;
-        const first = f[0], last = f[f.length - 1];
-        if (e.shiftKey && document.activeElement === first) { last.focus(); e.preventDefault(); }
-        else if (!e.shiftKey && document.activeElement === last) { first.focus(); e.preventDefault(); }
+    function onKeyDown(e){
+      if(e.key==="Escape"){e.preventDefault();closeModal();}
+      else if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="s"){e.preventDefault();modalForm.requestSubmit();}
+      else if(e.key==="Tab"){
+        const f=Array.from(focusables).filter(el=>!el.hasAttribute("disabled"));
+        if(!f.length) return; const first=f[0], last=f[f.length-1];
+        if(e.shiftKey && document.activeElement===first){ last.focus(); e.preventDefault();}
+        else if(!e.shiftKey && document.activeElement===last){ first.focus(); e.preventDefault();}
       }
     }
-    modal.addEventListener("keydown", onKeyDown, { once: false });
+    modal.addEventListener("keydown", onKeyDown, { once:false });
     modal._removeTrap = () => modal.removeEventListener("keydown", onKeyDown);
   });
 
-  // Reset draggable position to center
   centerModal();
 }
 
@@ -668,10 +685,8 @@ function closeModal() {
   if (typeof modal._removeTrap === "function") modal._removeTrap();
   modalForm.reset();
   editMode = false; editIndices = {};
-  // return modal to centered state for next open
   modalContent.style.left = ""; modalContent.style.top = "";
   modalContent.classList.remove("dragging");
-  // hide preview
   const preview = document.getElementById("modal-preview");
   if (preview) preview.hidden = true;
 }
@@ -679,54 +694,40 @@ function closeModal() {
 // Close handlers
 function onBackDropClick(e){ if (e.target === modal) closeModal(); }
 window.addEventListener("click", onBackDropClick);
-document.getElementById("close-modal").onclick = closeModal;
-document.getElementById("floating-close").onclick = closeModal;
-document.getElementById("modal-cancel").onclick = closeModal;
+closeModalBtn.onclick = closeModal;
+floatingClose.onclick = closeModal;
+modalCancelBtn.onclick = closeModal;
 
-// -------------------- Draggable (mouse + touch) --------------------
+// -------------------- Draggable --------------------
 const handle = document.querySelector(".drag-handle");
 let dragStartX = 0, dragStartY = 0, startLeft = 0, startTop = 0, dragging = false;
+function centerModal(){
+  const vw=window.innerWidth, vh=window.innerHeight;
+  const rect=modalContent.getBoundingClientRect();
+  modalContent.style.position="fixed";
+  modalContent.style.left=`${(vw-rect.width)/2}px`;
+  modalContent.style.top =`${(vh-rect.height)/2}px`;
+}
+function startDrag(x,y){ dragging=true; modalContent.classList.add("dragging"); dragStartX=x; dragStartY=y; const r=modalContent.getBoundingClientRect(); startLeft=r.left; startTop=r.top; }
+function moveDrag(x,y){
+  if(!dragging) return;
+  const dx=x-dragStartX, dy=y-dragStartY;
+  const vw=window.innerWidth, vh=window.innerHeight;
+  const rect=modalContent.getBoundingClientRect();
+  let nextLeft=startLeft+dx, nextTop=startTop+dy;
+  nextLeft=Math.min(Math.max(nextLeft,8), vw-rect.width-8);
+  nextTop =Math.min(Math.max(nextTop,8),  vh-rect.height-8);
+  modalContent.style.left=`${nextLeft}px`; modalContent.style.top=`${nextTop}px`;
+}
+function endDrag(){ dragging=false; modalContent.classList.remove("dragging"); }
+handle.addEventListener("mousedown",(e)=>{e.preventDefault();startDrag(e.clientX,e.clientY);});
+window.addEventListener("mousemove",(e)=>moveDrag(e.clientX,e.clientY));
+window.addEventListener("mouseup",endDrag);
+handle.addEventListener("touchstart",(e)=>{const t=e.touches[0];startDrag(t.clientX,t.clientY);},{passive:true});
+window.addEventListener("touchmove",(e)=>{const t=e.touches[0];moveDrag(t.clientX,t.clientY);},{passive:true});
+window.addEventListener("touchend",endDrag);
 
-function centerModal() {
-  const vw = window.innerWidth, vh = window.innerHeight;
-  const rect = modalContent.getBoundingClientRect();
-  modalContent.style.position = "fixed";
-  modalContent.style.left = `${(vw - rect.width)/2}px`;
-  modalContent.style.top  = `${(vh - rect.height)/2}px`;
-}
-function startDrag(clientX, clientY){
-  dragging = true;
-  modalContent.classList.add("dragging");
-  dragStartX = clientX; dragStartY = clientY;
-  const rect = modalContent.getBoundingClientRect();
-  startLeft = rect.left; startTop = rect.top;
-}
-function moveDrag(clientX, clientY){
-  if (!dragging) return;
-  const dx = clientX - dragStartX;
-  const dy = clientY - dragStartY;
-  const vw = window.innerWidth, vh = window.innerHeight;
-  const rect = modalContent.getBoundingClientRect();
-  let nextLeft = startLeft + dx;
-  let nextTop  = startTop + dy;
-  nextLeft = Math.min(Math.max(nextLeft, 8), vw - rect.width - 8);
-  nextTop  = Math.min(Math.max(nextTop, 8), vh - rect.height - 8);
-  modalContent.style.left = `${nextLeft}px`;
-  modalContent.style.top  = `${nextTop}px`;
-}
-function endDrag(){
-  dragging = false;
-  modalContent.classList.remove("dragging");
-}
-handle.addEventListener("mousedown", (e)=>{ e.preventDefault(); startDrag(e.clientX, e.clientY); });
-window.addEventListener("mousemove", (e)=> moveDrag(e.clientX, e.clientY));
-window.addEventListener("mouseup", endDrag);
-// touch
-handle.addEventListener("touchstart", (e)=>{ const t=e.touches[0]; startDrag(t.clientX, t.clientY); }, {passive:true});
-window.addEventListener("touchmove", (e)=>{ const t=e.touches[0]; moveDrag(t.clientX, t.clientY); }, {passive:true});
-window.addEventListener("touchend", endDrag);
-
-// ---------------- Admins picker + Live Preview ----------------
+// ---------------- Admins picker + Live Preview (COURSE) ----------------
 function buildAdminsUI(initialIds = [], updatePreview = false) {
   const selectedSet = new Set(initialIds);
   const selectedWrap = document.getElementById("admins-selected");
@@ -771,12 +772,15 @@ function buildAdminsUI(initialIds = [], updatePreview = false) {
           <img class="admin-avatar" src="${m.avatar}" alt="${m.name}">
           <div class="admin-meta">
             <div class="admin-name">${m.name}</div>
-            <div class="admin-email">${m.email}</div>
+            <div class="admin-email">${m.email || ""}</div>
             <div class="admin-roles">${rolesBadges}</div>
           </div>
         </label>
       `;
     }).join("");
+
+    // تمكين السحب لأسفل للنهاية بدون ما الـfooter يغطي
+    listEl.scrollTop = listEl.scrollHeight;
 
     listEl.querySelectorAll(".admin-checkbox").forEach(cb => {
       cb.addEventListener("change", (e) => {
@@ -793,18 +797,19 @@ function buildAdminsUI(initialIds = [], updatePreview = false) {
 }
 
 // Live preview helpers
-function setupTrackLivePreview({name, description, iconHTML, adminIds}) {
+function setupTrackLivePreview({name, description, iconHTML}) {
   updatePreviewName(name);
   updatePreviewDesc(description);
   updatePreviewIcon(iconHTML);
+}
+function setupCourseLivePreview({name, description, adminIds}) {
+  updatePreviewName(name);
+  updatePreviewDesc(description);
+  updatePreviewIcon("<i class='fa fa-book icon'></i>");
   updatePreviewAdmins(adminIds);
 }
-function updatePreviewName(v){
-  document.getElementById("preview-name").textContent = v || "Track name";
-}
-function updatePreviewDesc(v){
-  document.getElementById("preview-desc").textContent = v || "Description";
-}
+function updatePreviewName(v){ document.getElementById("preview-name").textContent = v || "Name"; }
+function updatePreviewDesc(v){ document.getElementById("preview-desc").textContent = v || "Description"; }
 function updatePreviewIcon(html){
   const holder = document.getElementById("preview-icon");
   holder.innerHTML = sanitizeHTMLIcon(html || "<i class='fa fa-microchip icon'></i>");
@@ -818,7 +823,7 @@ function updatePreviewAdmins(ids){
     return `
       <span class="chip chip-sm">
         <img src="${m.avatar}" alt="${m.name}">
-        <span class="chip-text">${m.name.split(" ")[0]}</span>
+        <span class="chip-text">${(m.name||"").split(" ")[0] || "Admin"}</span>
       </span>
     `;
   }).join("") + (ids.length>3?`<span class="chip-more">+${ids.length-3}</span>`:"");
@@ -870,13 +875,11 @@ function rejectApplication(id) {
 }
 
 // ================= Helpers =================
-function generateUUID() {
-  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
-    const r = (Math.random() * 16) | 0; const v = c === "x" ? r : (r & 0x3) | 0x8; return v.toString(16);
-  });
+function generateUUID(){
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g,function(c){const r=(Math.random()*16)|0;const v=c==="x"?r:(r&0x3)|0x8;return v.toString(16);});
 }
 
-// Inline notif CSS inject (kept)
+// Inline notif CSS inject
 (function addNotifCSS() {
   const style = document.createElement("style");
   style.innerHTML = `
