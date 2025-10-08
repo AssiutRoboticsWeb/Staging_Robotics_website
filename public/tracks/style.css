@@ -25,6 +25,7 @@ a{
 }
 a:hover {
     transform: scale(1.04);
+    color: var(--hover-color)
 }
 li:hover {
     transform: scale(1.04);
@@ -152,7 +153,7 @@ body {
     font-weight: 600;
     white-space: nowrap;
     direction: rtl;
-    transition: all 0.2s ease
+    transition: all 0.3s ease
 }
 
 .committee-btn:hover {
@@ -207,7 +208,9 @@ main {
     border-radius: 12px;
     border: 1px solid rgba(255, 255, 255, 0.06);
     box-shadow: 0 8px 28px rgba(0, 0, 0, 0.18);
-    transition: all 0.3s ease;
+    transition: all 0.4s ease;
+    cursor: pointer;
+    direction: ltr;
     /* outline: none; */
 }
 
@@ -220,11 +223,16 @@ main {
 .track-card:hover , 
 .team-card:hover {
     transform: translateY(-6px);
-    border-color: var(--accent-color)
-}
-.leaderboard-item:hover {
-    scale: 1.01;
-    color: var(--hover-color);
+    /* border-color: var(--accent-color); */
+    /* box-shadow: 0 8px 28px rgba(0, 0, 0, 0.28); */
+     box-shadow: 10px 9px 11px #52687b;
+    }
+    .leaderboard-item:hover {
+        scale: 1.02;
+        margin-bottom: 20px;
+        color: var(--hover-color);
+        /* box-shadow: 10px 9px 11px #52687b; */
+
 }
 
 .btn {
@@ -362,7 +370,7 @@ main {
     gap: 12px;
     align-items: center;
     min-width: 220px;
-    transition: all 0.3s ease;
+    transition: all 0.4s ease;
 }
 .footer-brand:hover {
     color: var(--hover-color);    
@@ -396,7 +404,8 @@ main {
 }
 
 .links-column {
-    min-width: 140px
+    min-width: 140px;
+    text-align: center;
 }
 
 .links-column h4 {
@@ -405,22 +414,23 @@ main {
 }
 
 .links-column ul {
-    list-style: none
+    list-style: none;
 }
 
 .links-column li {
-    margin-bottom: .45rem
+    margin-bottom: .45rem;
 }
 
 .links-column a {
     color: var(--muted);
     text-decoration: none;
-    font-size: .95rem
+    font-size: .95rem;
+    transition: all 0.3s ease
 }
 
 .links-column a:hover {
     color: #fff;
-    text-decoration: underline
+    text-decoration: underline;
 }
 
 .social-icons {
@@ -458,6 +468,8 @@ main {
     font-size: .95rem;
     color: var(--muted)
 }
+
+
 
 /* responsive */
 @media (max-width:1000px) {
@@ -535,7 +547,7 @@ main {
     }
 
     .track-card {
-        padding: .9rem
+        padding: .9rem;
     }
 
     .committee-btn {

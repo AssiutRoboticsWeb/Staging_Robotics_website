@@ -19,12 +19,18 @@ const backendUrl = (typeof API_BASE_URL !== 'undefined') ? API_BASE_URL + "/" : 
 
 /* بيانات تجريبية */
 const electricData = {
+    // committees: [
+    //     { id: "hardware", name: "لجنة الهاردوير", short: "الهاردوير", icon: "<i class='fa fa-cogs'></i>", description: "لجنة تصميم وتجميع القطع المادية.", tracks: [{ name: "Circuit Design", description: "تصميم الدوائر.", tasks: [{ name: "PCB Layout", description: "تصميم لوحة الدوائر المطبوعة.", link: "https://example.com/pcb", deadline: "2024-12-01" }] }, { name: "Mechanical", description: "التصميم الميكانيكي للروبوتات.", tasks: [] }] },
+    //     { id: "embeded", name: "لجنة الأنظمة المدمجة", short: "الأنظمة المدمجة", icon: "<i class='fa fa-microchip'></i>", description: "لجنة خاصة بكل ما يخص الأنظمة المدمجة ودوائر الإلكترونيات.", tracks: [{ name: "Embedded Basics", description: "أساسيات الأنظمة المدمجة.", tasks: [{ name: "Blink LED", description: "برمجة دائرة لجعل LED تضيء وتطفئ.", link: "https://example.com/blink", deadline: "2024-08-10" }, { name: "GPIO Input", description: "قراءة قيمة من زر.", link: "https://example.com/gpio", deadline: "2024-09-01" }] }, { name: "Sensors & Actuators", description: "التعامل مع حساسات ومحركات.", tasks: [] }] },
+    //     { id: "ros", name: "لجنة ROS", short: "ROS", icon: "<i class='fa fa-brain'></i>", description: "لجنة أنظمة الروبوت المفتوحة ROS ودمجها.", tracks: [{ name: "ROS Basics", description: "مبادئ ROS.", tasks: [] }, { name: "ROS Navigation", description: "تنقل في ROS.", tasks: [] }] },
+    //     { id: "vision", name: "لجنة الرؤية الحاسوبية", short: "الرؤية الحاسوبية", icon: "<i class='fa fa-camera'></i>", description: "لجنة تعلم الآلة ورؤية الحاسوب.", tracks: [{ name: "Intro CV", description: "مبادئ الرؤية.", tasks: [] }, { name: "Deep Learning", description: "شبكات عصبية للرؤية.", tasks: [] }] }
+    // ],
     committees: [
-        { id: "hardware", name: "لجنة الهاردوير", short: "الهاردوير", icon: "<i class='fa fa-cogs'></i>", description: "لجنة تصميم وتجميع القطع المادية.", tracks: [{ name: "Circuit Design", description: "تصميم الدوائر.", tasks: [{ name: "PCB Layout", description: "تصميم لوحة الدوائر المطبوعة.", link: "https://example.com/pcb", deadline: "2024-12-01" }] }, { name: "Mechanical", description: "التصميم الميكانيكي للروبوتات.", tasks: [] }] },
-        { id: "embeded", name: "لجنة الأنظمة المدمجة", short: "الأنظمة المدمجة", icon: "<i class='fa fa-microchip'></i>", description: "لجنة خاصة بكل ما يخص الأنظمة المدمجة ودوائر الإلكترونيات.", tracks: [{ name: "Embedded Basics", description: "أساسيات الأنظمة المدمجة.", tasks: [{ name: "Blink LED", description: "برمجة دائرة لجعل LED تضيء وتطفئ.", link: "https://example.com/blink", deadline: "2024-08-10" }, { name: "GPIO Input", description: "قراءة قيمة من زر.", link: "https://example.com/gpio", deadline: "2024-09-01" }] }, { name: "Sensors & Actuators", description: "التعامل مع حساسات ومحركات.", tasks: [] }] },
-        { id: "ros", name: "لجنة ROS", short: "ROS", icon: "<i class='fa fa-brain'></i>", description: "لجنة أنظمة الروبوت المفتوحة ROS ودمجها.", tracks: [{ name: "ROS Basics", description: "مبادئ ROS.", tasks: [] }, { name: "ROS Navigation", description: "تنقل في ROS.", tasks: [] }] },
-        { id: "vision", name: "لجنة الرؤية الحاسوبية", short: "الرؤية الحاسوبية", icon: "<i class='fa fa-camera'></i>", description: "لجنة تعلم الآلة ورؤية الحاسوب.", tracks: [{ name: "Intro CV", description: "مبادئ الرؤية.", tasks: [] }, { name: "Deep Learning", description: "شبكات عصبية للرؤية.", tasks: [] }] }
-    ],
+    { id: "hardware", name: "Hardware Committee", short: "Hardware", icon: "<i class='fa fa-cogs'></i>", description: "Committee for designing and assembling physical parts.", tracks: [{ name: "Circuit Design", description: "Designing circuits.", tasks: [{ name: "PCB Layout", description: "Designing the printed circuit board.", link: "https://example.com/pcb", deadline: "2024-12-01" }] }, { name: "Mechanical", description: "Mechanical design for robots.", tasks: [] }] },
+    { id: "embedded", name: "Embedded Systems Committee", short: "Embedded Systems", icon: "<i class='fa fa-microchip'></i>", description: "Committee for everything related to embedded systems and electronics circuits.", tracks: [{ name: "Embedded Basics", description: "Fundamentals of embedded systems.", tasks: [{ name: "Blink LED", description: "Programming a circuit to make an LED blink.", link: "https://example.com/blink", deadline: "2024-08-10" }, { name: "GPIO Input", description: "Reading a value from a button.", link: "https://example.com/gpio", deadline: "2024-09-01" }] }, { name: "Sensors & Actuators", description: "Dealing with sensors and actuators.", tasks: [] }] },
+    { id: "ros", name: "ROS Committee", short: "ROS", icon: "<i class='fa fa-brain'></i>", description: "Committee for Robot Operating System (ROS) and its integration.", tracks: [{ name: "ROS Basics", description: "Principles of ROS.", tasks: [] }, { name: "ROS Navigation", description: "Navigation in ROS.", tasks: [] }] },
+    { id: "vision", name: "Computer Vision Committee", short: "Computer Vision", icon: "<i class='fa fa-camera'></i>", description: "Committee for machine learning and computer vision.", tracks: [{ name: "Intro CV", description: "Principles of vision.", tasks: [] }, { name: "Deep Learning", description: "Neural networks for vision.", tasks: [] }] }
+],
     teamData: {
         mainTeam: [
             { name: "John Smith", role: "Technical Lead, Robotics & AI", department: "Department of Robotics and Automation", image: "https://picsum.photos/150/150?random=1" },
@@ -54,7 +60,7 @@ function renderCommitteesNav() {
     committeesNav.innerHTML = electricData.committees.map(c => {
         return `<button class="committee-btn" data-id="${c.id}" onclick="selectCommittee('${c.id}')">${c.name}</button>`;
     }).join('');
-    committeesNav.insertAdjacentHTML('afterbegin', `<button class="committee-btn" data-id="all-committees" onclick="selectCommittee('all-committees')">كل اللجان</button>`);
+    committeesNav.insertAdjacentHTML('afterbegin', `<button class="committee-btn" data-id="all-committees" onclick="selectCommittee('all-committees')">All Committees</button>`);
     // ensure visible for desktop
     if (window.innerWidth > 820) {
         committeesNav.style.display = 'flex';
@@ -119,9 +125,16 @@ function renderTracks(tracks = [], title) {
     <div class="track-card" onclick="tapSwitching(this)" id="${escapeId(t.name)}">
       <div class="track-icon">${t.icon || "<i class='fa fa-layer-group'></i>"}</div>
       <h3>${t.name}</h3>
-      <p>${t.description || ''}${t.committee ? '<br><small>اللجنة: ' + t.committee + '</small>' : ''}</p>
+      <p>${t.description || ''}${t.committee ? '<br><small> committee: ' + t.committee + '</small>' : ''}</p>
     </div>
   `).join('');
+//     tracksSection.innerHTML = tracks.map(t => `
+//     <div class="track-card" onclick="tapSwitching(this)" id="${escapeId(t.name)}">
+//       <div class="track-icon">${t.icon || "<i class='fa fa-layer-group'></i>"}</div>
+//       <h3>${t.name}</h3>
+//       <p>${t.description || ''}${t.committee ? '<br><small>اللجنة: ' + t.committee + '</small>' : ''}</p>
+//     </div>
+//   `).join('');
 }
 function escapeId(name) { return String(name).replace(/\s+/g, '-').replace(/[^a-zA-Z0-9-_ء-يـ]/g, ''); }
 
