@@ -93,7 +93,7 @@ navMenu.addEventListener('click', (e) => {
 // Fetch and display members
 async function fetchMembers() {
     try {
-        const response = await fetch(`${baseUrl}/members/get/${committee }`, {
+        const response = await fetch(`${baseUrl}/members/get/${committee}`, {
             method : "GET",
             headers : {
                 authorization : "bearer " + token
