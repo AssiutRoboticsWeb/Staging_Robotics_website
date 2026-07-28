@@ -5,6 +5,8 @@
 (function () {
     'use strict';
 
+
+    
     // Configuration data
     const configs = {
         development: {
