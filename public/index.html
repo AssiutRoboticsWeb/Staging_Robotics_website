@@ -1,25 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<!-- header 
-
-
-
-
-Main Page
-
-
-
-
--->
-
-
 <head>
     <meta http-equiv="cache-control" content="no-cache" />
     <meta http-equiv="expires" content="0" />
     <meta http-equiv="pragma" content="no-cache" />
     <meta charset="UTF-8" />
     <title>Assiut Robotics — Student Robotics Club</title>
+<<<<<<< Updated upstream
     <meta name="description" content="Assiut Robotics: student robotics projects, competitions (Micromouse, ROVs, Minesweepers), events, and member resources.">
     <meta property="og:title" content="Assiut Robotics — Student Robotics Club">
     <meta property="og:description" content="Assiut Robotics: student robotics projects, competitions and events.">
@@ -27,242 +15,214 @@ Main Page
 
    <meta name="author" content="Software Committee - Assiut Robotics" />
     <meta name="keywords" content="Assiut, Robotics, AR, Robot, ROV, Minesweeper, Micromouse, Engineering, أسيوط روبوتكس, روبوتكس, روبوتات" />
+=======
+    <meta name="description"
+        content="Assiut Robotics: student robotics projects, competitions (Micromouse, ROVs, Minesweepers), events, and member resources.">
+    <meta property="og:title" content="Assiut Robotics — Student Robotics Club">
+    <meta property="og:description" content="Assiut Robotics: student robotics projects, competitions and events.">
+    <meta property="og:image" content="./all-images/default.png" />
+
+    <link rel="canonical" href="https://assiut-robotics-website-xi.vercel.app/">
+
+    <meta name="author" content="Software Committee - Assiut Robotics" />
+    <meta name="keywords"
+        content="Assiut, Robotics, AR, Robot, ROV, Minesweeper, Micromouse, Engineering, أسيوط روبوتكس, روبوتكس, روبوتات" />
+>>>>>>> Stashed changes
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" href="./all-images/default.png" />
     <link rel="stylesheet" href="main/View.css" />
     <link rel="stylesheet" href="./main/footerAndheader.css" />
+
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+
+
     <link href="https://fonts.googleapis.com/css?family=Raleway:900&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700&amp;subset=latin-ext"
         rel="stylesheet" />
+
     <link rel="shortcut icon" href="all-images/logo.ico" />
+
+    <!-- AOS Animation Library -->
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
     <!-- Include jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Include Server Configuration -->
+    <script src="config/server-config.js"></script>
+    <script src="utiles/constants.js"></script>
+    <script src="main/language-manager.js"></script>
 </head>
+
 <body>
     <!-- header -->
     <div id="myUniqueHeaderID"></div>
-    
-    <div class="above-container">
-        <div id="container">
-            <span id="text1"></span>
-            <span id="text2"></span>
-        </div>
 
-    </div>
-    <div class="row mb-2">
-        <h1>Our Team</h1>
-    </div>
-
-    <div class="image-slider">
-        <section class="slider__content">
-            <button type="button" class="slider-control--button prev-button">
-                <svg width="16" height="16" fill="currentColor" class="icon arrow-left-circle" viewBox="0 0 16 16">
-                    <path fill-rule="evenodd"
-                        d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8m15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-4.5-.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z" />
-                </svg>
-            </button>
-            <main class="image-display"></main>
-            <button type="button" class="slider-control--button next-button">
-                <svg width="16" height="16" fill="currentColor" class="icon arrow-right-circle" viewBox="0 0 16 16">
-                    <path fill-rule="evenodd"
-                        d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8m15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0M4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5z" />
-                </svg>
-            </button>
-        </section>
-        <nav class="slider-navigation">
-            <button class="nav-button" aria-selected="true">
-                <img class="thumbnail" src="all-images/RoboticsLap.jpg" alt="Thumbnail 1" />
-            </button>
-            <button class="nav-button" aria-selected="false">
-                <img class="thumbnail" src="all-images/rov111111111.jpg" alt="Thumbnail 2" />
-            </button>
-            <button class="nav-button" aria-selected="false">
-                <img class="thumbnail" src="all-images/mine.jpg" alt="Thumbnail 3" />
-            </button>
-            <button class="nav-button" aria-selected="false">
-                <img class="thumbnail" src="all-images/2.jpeg" alt="Thumbnail 4" />
-            </button>
-            <button class="nav-button" aria-selected="false">
-                <img class="thumbnail" src="all-images/Rov1.jpg" alt="Thumbnail 5" />
-            </button>
-            <button class="nav-button" aria-selected="false">
-                <img class="thumbnail" src="all-images/mine2.jpg" alt="Thumbnail 6" />
-            </button>
-            <button class="nav-button" aria-selected="false">
-                <img class="thumbnail" src="all-images/ourteam.jpg" alt="Thumbnail 6" />
-            </button>
-        </nav>
-        <!-- <script src="inex.js"></script> -->
-    </div>
-
-    <section>
-
-        <div class="row">
-            <!-- Column 1-->
-            <div class="column">
-                <div class="card">
-                    <div class="img-container">
-                        <img src="all-images/web.jpg" />
-                    </div>
-                    <a target="_blank">
-                        <h3>Web Design Committee</h3>
-                    </a>
-                    <div class="card-description fade22">
-                        The Web Design Committee focuses on creating and maintaining websites that are
-                        user-friendly, visually appealing, and accessible.
-                    </div>
-                </div>
-            </div>
-
-            <!-- Column 2-->
-            <div class="column">
-                <div class="card">
-                    <div class="img-container">
-                        <img src="all-images/oc.jpg" />
-                    </div>
-                    <a target="_blank">
-                        <h3>OC Committee</h3>
-                    </a>
-                    <div class="card-description fade22">
-                        The OC Committee ensures smooth execution of events by coordinating logistics, managing
-                        schedules, and overseeing event operations to ensure everything runs efficiently and
-                        effectively.
-                    </div>
-                </div>
-            </div>
-            <!-- Column 3-->
-            <div class="column">
-                <div class="card">
-                    <div class="img-container">
-                        <img src="all-images/media.jpg" />
-                    </div>
-                    <a target="_blank">
-                        <h3>Media Committee</h3>
-                    </a>
-                    <div class="card-description fade22">
-                        The Media Committee is responsible for capturing and sharing the essence of our events
-                        through photography, videography, and social media, ensuring a strong and positive online
-                        presence.
-                    </div>
-                </div>
+    <!-- Hero Section -->
+    <section class="hero-section" aria-label="Hero Slider">
+        <!-- Animated Text Overlay -->
+        <div class="above-container" role="presentation">
+            <div id="container">
+                <span id="text1" aria-hidden="true"></span>
+                <span id="text2" aria-hidden="true"></span>
             </div>
         </div>
 
-        <div class="row">
-            <!-- Column 1-->
-            <div class="column">
-                <div class="card">
-                    <div class="img-container">
-                        <img src="all-images/marketing.jpg" />
-                    </div>
-                    <a target="_blank">
-                        <h3>Marketing Committee</h3>
-                    </a>
-                    <div class="card-description fade22">
-                        The Marketing Committee drives engagement and awareness by developing creative campaigns,
-                        managing promotional activities, and leveraging various marketing channels to reach our
-                        target audience.
-                    </div>
-                </div>
-            </div>
+        <!-- Image Slider -->
+        <div class="image-slider" role="region" aria-label="Team Gallery">
+            <section class="slider__content">
+                <button type="button" class="slider-control--button prev-button" aria-label="Previous image">
+                    <svg width="16" height="16" fill="currentColor" class="icon arrow-left-circle" viewBox="0 0 16 16"
+                        aria-hidden="true">
+                        <path fill-rule="evenodd"
+                            d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8m15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-4.5-.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z" />
+                    </svg>
+                </button>
+                <main class="image-display" role="img" aria-live="polite"></main>
+                <button type="button" class="slider-control--button next-button" aria-label="Next image">
+                    <svg width="16" height="16" fill="currentColor" class="icon arrow-right-circle" viewBox="0 0 16 16"
+                        aria-hidden="true">
+                        <path fill-rule="evenodd"
+                            d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8m15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0M4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5z" />
+                    </svg>
+                </button>
+            </section>
 
-            <!-- Column 2-->
-            <div class="column">
-                <div class="card">
-                    <div class="img-container">
-                        <img src="all-images/hr.jpg" />
-                    </div>
-                    <a target="_blank">
-                        <h3>HR Committee</h3>
-                    </a>
-                    <div class="card-description fade22">
-                        The HR Committee focuses on recruitment, training, and development, ensuring that we have a
-                        motivated and well-prepared team to achieve our goals and maintain a positive organizational
-                        culture.
-                    </div>
-                </div>
+            <!-- Thumbnail Navigation -->
+            <nav class="slider-navigation" aria-label="Image thumbnails">
+                <button type="button" class="nav-button" aria-selected="true" aria-label="View robotics lab image">
+                    <img class="thumbnail" src="all-images/RoboticsLap.jpg" alt="Robotics Lab" loading="lazy" />
+                </button>
+                <button type="button" class="nav-button" aria-selected="false" aria-label="View ROV project image">
+                    <img class="thumbnail" src="all-images/competitions/rov/rov111111111.jpg" alt="ROV Project" loading="lazy" />
+                </button>
+                <button type="button" class="nav-button" aria-selected="false" aria-label="View minesweeper robot image">
+                    <img class="thumbnail" src="all-images/competitions/mine/mine.jpg" alt="Minesweeper Robot" loading="lazy" />
+                </button>
+                <button type="button" class="nav-button" aria-selected="false" aria-label="View team workshop image">
+                    <img class="thumbnail" src="all-images/competitions/mine/mine2.jpg" alt="Team Workshop" loading="lazy" />
+                </button>
+                <button type="button" class="nav-button" aria-selected="false" aria-label="View ROV competition image">
+                    <img class="thumbnail" src="all-images/competitions/rov/Rov1.jpg" alt="ROV Competition" loading="lazy" />
+                </button>
+                <button type="button" class="nav-button" aria-selected="false" aria-label="View minesweeper competition image">
+                    <img class="thumbnail" src="all-images/competitions/mine/mine2.jpg" alt="Minesweeper Competition" loading="lazy" />
+                </button>
+                <button type="button" class="nav-button" aria-selected="false" aria-label="View team photo">
+                    <img class="thumbnail" src="all-images/ourteam.jpg" alt="Our Team" loading="lazy" />
+                </button>
+            </nav>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <!-- <section class="stats-section">
+        <div class="stats-grid">
+            <div class="stat-item" data-aos="fade-up" data-aos-delay="100">
+                <i class="fa fa-users"></i>
+                <span>100+</span>
+                <p>Members</p>
             </div>
-            <!-- Column 3-->
-            <div class="column">
-                <div class="card">
-                    <div class="img-container">
-                        <img src="all-images/pr.jpg" />
-                    </div>
-                    <a target="_blank">
-                        <h3>PR Committee</h3>
-                    </a>
-                    <div class="card-description fade22">
-                        The PR Committee manages the organization's public image by building relationships with
-                        media, crafting press releases, and handling communications to maintain a positive and
-                        professional reputation.
-                    </div>
-                </div>
+            <div class="stat-item" data-aos="fade-up" data-aos-delay="200">
+                <i class="fa fa-calendar"></i>
+                <span>15+</span>
+                <p>Years</p>
             </div>
         </div>
-        <div class="row">
-            <div class="column">
-                <div class="card">
-                    <div class="img-container">
-                        <img src="all-images/web.jpg" />
-                    </div>
-                    <a target="_blank">
-                        <h3>AC Electrical</h3>
-                    </a>
-                    <div class="card-description fade22">
-                        The AC Electrical Committee focuses on the design, implementation, and maintenance of
-                        electrical systems  in our projects, ensuring safety, efficiency, and innovation.
-                    </div>
-                </div>
-            </div>
-            <div class="column">
-                <div class="card">
-                    <div class="img-container">
-                        <img src="all-images/web.jpg" />
-                    </div>
-                    <a target="_blank">
-                        <h3>AC Mechanical</h3>
-                    </a>
-                    <div class="card-description fade22">
-                        The AC Mechanical Committee focuses on the design, implementation, and maintenance of
-                        mechanical systems in our projects, ensuring safety, efficiency, and innovation.
+    </section>  -->
+
+    <!-- <div class="divider-pulse" data-aos="fade-up"></div> -->
+
+    <!-- About Section -->
+    <!-- <section id="about" class="about-section" data-aos="fade-up">
+        <div class="container">
+            <div class="about-content">
+                <div class="about-text">
+                    <h1 data-i18n="about_us">About Us</h1>
+                    <p data-i18n="we_are_assiut_robotics_the_first_team_sp">
+                        We are Assiut Robotics, the first team specialized in robotics at the Faculty of Engineering, Assiut University. We aim to develop technical and engineering skills for students through practical projects and local and international competitions.
+                    </p>
+                    <div class="mission-vision">
+                        <div class="mission">
+                            <h3 data-i18n="our_vision">Our Vision</h3>
+                            <p data-i18n="to_be_one_of_the_most_prominent_leading">
+                                To be one of the most prominent leading teams in robotics, helping students develop their technical and engineering skills to efficiently integrate into the labor market.
+                            </p>
+                        </div>
+                        <div class="vision">
+                            <h3 data-i18n="our_mission">Our Mission</h3>
+                            <p data-i18n="to_inspire_future_generations_of_enginee">
+                                To inspire future generations of engineers and programmers through hands-on experience, teamwork, and continuous innovation.
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
-<section>
-    <h1>Achievements</h1>
-    <p style="text-align: center; padding: 2rem;">we have achieved a perfect place in these competition</p>
-    <div id="Ach_cards">
-       
-        <div>
 
-            <img src="./all-images/ROV2017.png">
-            <h2>ROV2017</h2>
-            <p>
-                The 2017 ROV Competition, organized by the MATE Center, was a global event promoting innovation in underwater robotics. Teams from around the world built and operated ROVs to complete complex underwater missions. The competition aimed to inspire students to pursue STEM careers through real-world challenges.
-                
-             </p>
-             <a href="./achievements/index_rov.html"> <button class="learnMore">Learn more</button></a>
-        </div>
-       
-        <div>
+    <div class="divider-pulse" data-aos="fade-up"></div> -->
 
-            <img src="./all-images/mine.jpg">
-            <h2>Minesweepers Competition</h2>
-            <p>The Minesweepers Competition is a global event focused on developing robotic solutions for landmine detection and removal. It promotes innovation and teamwork among international teams to build safe and efficient systems for dangerous environments. The competition supports technological advancement in humanitarian demining.
-            </p>
-            <a href="./achievements/index_mins.html"> <button class="learnMore">Learn more</button></a>
+    <!-- What We Do Section -->
+    <section class="what-we-do">
+        <h1 data-aos="fade-up" data-i18n="what_we_do">What We Do</h1>
+        <div class="activities-grid">
+            <div class="activity-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="activity-icon">
+                    <i class="fa fa-cogs"></i>
+                </div>
+                <h3 data-i18n="robotics_design">Robotics Design</h3>
+                <p data-i18n="building_advanced_autonomous_and_rov_sys">
+                    Building advanced autonomous and ROV systems using cutting-edge technology
+                </p>
+            </div>
+            <div class="activity-card" data-aos="fade-up" data-aos-delay="200">
+                <div class="activity-icon">
+                    <i class="fa fa-flask"></i>
+                </div>
+                <h3 data-i18n="research_development">Research & Development</h3>
+                <p data-i18n="researching_ai_control_systems_and_mecha">
+                    Researching AI, control systems, and mechanical design to solve real-world problems
+                </p>
+            </div>
+            <div class="activity-card" data-aos="fade-up" data-aos-delay="300">
+                <div class="activity-icon">
+                    <i class="fa fa-graduation-cap"></i>
+                </div>
+                <h3 data-i18n="training_education">Training & Education</h3>
+                <p data-i18n="providing_handson_workshops_in_software">
+                    Providing hands-on workshops in software, embedded systems, and mechanics
+                </p>
+            </div>
+            <div class="activity-card" data-aos="fade-up" data-aos-delay="400">
+                <div class="activity-icon">
+                    <i class="fa fa-trophy"></i>
+                </div>
+                <h3 data-i18n="competitions">Competitions</h3>
+                <p data-i18n="competing_globally_in_rov_minesweepers_a">
+                    Competing globally in ROV, Minesweepers, and AI challenges
+                </p>
+            </div>
         </div>
-        <div>
+    </section>
 
-            <img src="./all-images/micrologo.png">
-            <h2>Micromouse Competition</h2>
-            <p>The Micromouse competition challenges small autonomous robots to navigate a 16×16 maze and reach the center on their own. Robots explore the maze, detect walls, and track their position to find the goal. After mapping the maze, they race through the optimal path in the shortest time.
-            </p>
-            <a href="./achievements/index_micro.html"> <button class="learnMore">Learn more</button></a>
+    <div class="divider-pulse" data-aos="fade-up"></div>
+
+    <section id="committees">
+        <h1 data-aos="fade-up" data-i18n="our_committees">Our Committees</h1>
+        <p class="subtitle" data-aos="fade-up" data-i18n="discover_the_roles_that_drive_our_succes">Discover the roles that drive our success.</p>
+
+        <div id="committees-container" data-aos="fade-up"></div>
+
+        <div class="section-cta" data-aos="fade-up">
+            <a href="committees/" class="learn-more-btn"
+               data-i18n="learn_more_about_our_committees">
+                Learn More About Our Committees
+                <i class="fas fa-arrow-right"></i>
+            </a>
         </div>
+<<<<<<< Updated upstream
     </div>
 </section>
 <section id="pioneers">
@@ -298,12 +258,73 @@ Main Page
         </div>
     </div>
 </section>
+=======
+    </section>
+
+    <div class="divider-pulse" data-aos="fade-up"></div>
+
+    <section>
+        <h1 data-aos="fade-up" data-i18n="achievements">Achievements</h1>
+        <p class="subtitle" data-aos="fade-up" data-i18n="we_have_achieved_a_perfect_place_in_thes">we have achieved a perfect place in these competition</p>
+        <div id="Ach_cards" data-aos="fade-up">
+            <!-- Content loaded via achievements-loader.js -->
+        </div>
+
+        <div class="section-cta" data-aos="fade-up">
+            <a href="achievements/" class="learn-more-btn"
+               data-i18n="learn_more_about_our_achievements">
+                Learn More About Our Achievements
+                <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+    </section>
+
+    <div class="divider-pulse" data-aos="fade-up"></div>
+
+    <!-- Team Board Section -->
+    <section id="team-board">
+        <h1 data-aos="fade-up" data-i18n="team_board">Team Board</h1>
+        <p class="subtitle" data-aos="fade-up" data-i18n="meet_the_dedicated_individuals_behind_ou">Meet the dedicated individuals behind our success.</p>
+        <div id="team-board-container" data-aos="fade-up">
+            <!-- Content loaded via main/team-loader.js -->
+        </div>
+    </section>
+
+    <div class="divider-pulse" data-aos="fade-up"></div>
+
+    <section id="pioneers">
+        <h1 data-aos="fade-up" data-i18n="pioneers">Pioneers</h1>
+        <p class="subtitle" data-aos="fade-up" data-i18n="those_who_paved_the_way_for_our_success">Those who paved the way for our success.</p>
+        <div id="pioneers-container" data-aos="fade-up">
+            <!-- Content loaded via main/pioneers-loader.js -->
+        </div>
+    </section>
+
+>>>>>>> Stashed changes
     <!--Footer-->
     <div id="myUniqueFooterID"></div>
-    <script src="./config/server-config.js"></script>
+
+    <!--Scripts-->
     <script src="main/View.js"></script>
+
+    <!--Loaders-->
+    <script src="main/committees-loader.js"></script>
+    <script src="main/achievements-loader.js"></script>
+    <script src="main/pioneers-loader.js"></script>
+    <script src="main/team-loader.js"></script>
+
+
     <script src="./main/footerAndheader.js" defer></script>
 
+    <!-- AOS Animation Library -->
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>
+        AOS.init({
+            duration: 800,
+            easing: 'ease-in-out',
+            once: true
+        });
+    </script>
 
 </body>
 

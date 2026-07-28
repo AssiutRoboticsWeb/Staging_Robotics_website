@@ -1,7 +1,7 @@
 
-import Loader  from "../utiles/loader.js";
+import Loader from "../utiles/loader.js";
 
-const baseUrl = API_BASE_URL; // from server-config.js
+const baseUrl = ServerConfig.getMainAPI(); // from server-config.js
 console.log(baseUrl);
 
 // DOM Elements
@@ -23,16 +23,15 @@ let membersData = [];
 
 const adminData = JSON.parse(localStorage.getItem('data'));
 var committee = adminData.committee;
-console.log("committee",committee);
+console.log("committee", committee);
 
 var role = adminData.role;
-if(role.includes('HR ')) 
-{
+if (role.includes('HR ')) {
     committee = role.split(' ')[1];
-    console.log("committee",committee);
-    
+    console.log("committee", committee);
+
 }
-console.log("admin data:",adminData);
+console.log("admin data:", adminData);
 
 const form = document.getElementById('taskForm')
 const token = window.localStorage.getItem('token');
@@ -70,11 +69,11 @@ navMenu.addEventListener('click', (e) => {
     if (e.target.tagName === 'A') {
         e.preventDefault();
         const sectionId = e.target.dataset.section + 'Section';
-        
+
         // Update active state
         navMenu.querySelectorAll('a').forEach(a => a.classList.remove('active'));
         e.target.classList.add('active');
-        
+
         // Show selected section
         sections.forEach(section => {
             section.classList.add('hidden');
@@ -93,19 +92,22 @@ navMenu.addEventListener('click', (e) => {
 // Fetch and display members
 async function fetchMembers() {
     try {
+<<<<<<< Updated upstream
         const response = await fetch(`${baseUrl}/members/get/${committee}`, {
             method : "GET",
             headers : {
                 authorization : "bearer " + token
             }
         });
+=======
+        const response = await fetch(APIConfig.getMembersEndpoint(`/get/${committee}`));
+>>>>>>> Stashed changes
         const data = await response.json();
         console.log(data);
-        if(data.message == "token is required")
-        {
+        if (data.message == "token is required") {
             window.location.href = "../login/index.html"
         }
-        if(!data.date){
+        if (!data.date) {
             Toastify({
                 text: "Error fetching members",
                 duration: 3000,
@@ -126,7 +128,7 @@ async function fetchMembers() {
         members = data.date;
         membersData = members;
         console.log(members);
-        
+
         // Populate member filter
         memberFilter.innerHTML = '<option value="">All Members</option>';
         members.forEach(member => {
@@ -134,7 +136,7 @@ async function fetchMembers() {
                 <option value="${member._id}">${member.name}</option>
             `;
         });
-        
+
         // Populate members grid for task assignment
         // Add "Select All" checkbox
         membersGrid.innerHTML = `
@@ -152,7 +154,7 @@ async function fetchMembers() {
             const checkboxes = membersGrid.querySelectorAll('input[type="checkbox"]:not(#selectAllMembers)');
             checkboxes.forEach(cb => cb.checked = selectAllBox.checked);
         });
-        
+
         // Fill HR Evaluation select with members
         fillMemberSelectOptions();
         // Initial task display
@@ -161,7 +163,7 @@ async function fetchMembers() {
         displayMembers();
     } catch (error) {
         console.log(error.message);
-        
+
         console.error('Error fetching members:', error);
     }
 }
@@ -213,12 +215,12 @@ function displayMembers() {
 
     // membersList.innerHTML = '<h2>Team Members</h2>';
     console.log("display Member");
-    
-    membersList.innerHTML='';
+
+    membersList.innerHTML = '';
     members.forEach(member => {
         const memberCard = document.createElement('div');
         memberCard.className = 'member-card';
-        
+
         memberCard.innerHTML = `
             <div class="member-info">
             <img src="${member.avatar}" alt="${member.name}" class="member-avatar">
@@ -272,18 +274,18 @@ function displayMembers() {
 }
 // =================================================================================================================
 
-window.show_penalities = function(member , type){
+window.show_penalities = function (member, type) {
     const memberData = membersData.find(m => m._id === member);
     console.log(memberData)
     if (memberData) {
         const penalties = (type == "warning") ? memberData.warnings || [] : memberData.alerts || [];
         // Display penalties to the user
         console.log("Penalties:", penalties);
-    showPenaltiesModal(penalties,type,memberData._id);
+        showPenaltiesModal(penalties, type, memberData._id);
     }
 }
-window.showPenaltiesModal = function(penalties,type,memberId){
-    console.log("showPenaltiesModal",penalties);
+window.showPenaltiesModal = function (penalties, type, memberId) {
+    console.log("showPenaltiesModal", penalties);
     const modal = document.createElement('div');
     modal.className = 'penalties-modal';
     modal.innerHTML = `
@@ -296,9 +298,8 @@ window.showPenaltiesModal = function(penalties,type,memberId){
                     <h3 style="margin-bottom: 18px;" >${type}</h3>
                 </div>
                 <div>
-                    ${
-                        penalties.length > 0
-                        ? `<div style="padding-left:0; list-style:none; margin-bottom: 0;">
+                    ${penalties.length > 0
+            ? `<div style="padding-left:0; list-style:none; margin-bottom: 0;">
                             ${penalties.map(p => `
                                 <div class = "penalty-item">
                                <button class = "remove_penalties" onclick="removePenalty('${memberId}', '${type}', '${p._id}')">remove ${type}</button>
@@ -309,8 +310,8 @@ window.showPenaltiesModal = function(penalties,type,memberId){
                                 
                                 </div>`).join('')}
                            </div>`
-                        : `<p style="color:#888;">No penalties found.</p>`
-                    }
+            : `<p style="color:#888;">No penalties found.</p>`
+        }
                 </div>
             </div>
         </div>
@@ -318,7 +319,7 @@ window.showPenaltiesModal = function(penalties,type,memberId){
     document.body.appendChild(modal);
 }
 
-window.addPenalty = function(memberId, type) {
+window.addPenalty = function (memberId, type) {
     // Open a form to get penalty details and submit to server
     const modal = document.createElement('div');
     modal.className = 'penalty-add-modal';
@@ -357,7 +358,7 @@ window.addPenalty = function(memberId, type) {
     `;
     document.body.appendChild(modal);
 
-    document.getElementById('addPenaltyForm').onsubmit = async function(e) {
+    document.getElementById('addPenaltyForm').onsubmit = async function (e) {
         e.preventDefault();
         const formData = new FormData(e.target);
         const penalty = {
@@ -387,7 +388,7 @@ window.addPenalty = function(memberId, type) {
                     backgroundColor: "#4CAF50",
                 }).showToast();
                 console.log(data);
-                
+
                 modal.remove();
                 await fetchMembers();
             } else {
@@ -403,12 +404,12 @@ window.addPenalty = function(memberId, type) {
                 backgroundColor: "#f44336",
             }).showToast();
             console.log(err);
-            
+
         }
     };
 }
 
-window.removePenalty = function(memberId, type, penaltyId) {
+window.removePenalty = function (memberId, type, penaltyId) {
     fetch(`${baseUrl}/members/removeWarningAlert/${memberId}/${penaltyId}`, {
         method: 'POST',
         headers: {
@@ -418,7 +419,7 @@ window.removePenalty = function(memberId, type, penaltyId) {
         body: JSON.stringify({ type })
     }).then(res => res.json()).then((res) => {
         console.log(res)
-        if(res.status != 200) {
+        if (res.status != 200) {
             Toastify({
                 text: 'Error removing penalty: ' + (res.message || 'Unknown error'),
                 duration: 3000,
@@ -433,9 +434,9 @@ window.removePenalty = function(memberId, type, penaltyId) {
                 duration: 3000,
                 close: true,
                 gravity: "top",
-            position: "right",
-            backgroundColor: "#4CAF50",
-        }).showToast();
+                position: "right",
+                backgroundColor: "#4CAF50",
+            }).showToast();
         }
     }).catch(err => {
         console.error(err);
@@ -458,14 +459,14 @@ window.removePenalty = function(memberId, type, penaltyId) {
 function displayAllTasks() {
     submittedTasksList.innerHTML = '';
     pendingTasksList.innerHTML = '';
-    
+
     members.forEach(member => {
         member.tasks.forEach(task => {
             const taskElement = createTaskElement(task, member);
             if (task.submissionLink && task.submissionLink !== '*') {
                 submittedTasksList.appendChild(taskElement);
-                addEvent(task.submissionFileId,task.downloadSubmissionUrl) /* adding event to the download btn*/
-    
+                addEvent(task.submissionFileId, task.downloadSubmissionUrl) /* adding event to the download btn*/
+
             } else {
                 pendingTasksList.appendChild(taskElement);
             }
@@ -473,11 +474,11 @@ function displayAllTasks() {
     });
 }
 //task.downloadSubmissionUrl
-function addEvent(id,URL){
-    console.log('id:',id);
-    
+function addEvent(id, URL) {
+    console.log('id:', id);
+
     let element = document.getElementById(id);
-    element.addEventListener('click',()=>{
+    element.addEventListener('click', () => {
         window.location.href = URL;
     })
 }
@@ -485,7 +486,7 @@ function addEvent(id,URL){
 function createTaskElement(task, member) {
     const div = document.createElement('div');
     div.className = `task-card ${task.submissionLink && task.submissionLink !== '*' ? 'submitted' : 'pending'}`;
-    console.log("task:",task,task.submissionLink && task.submissionLink !== '*' ? 'submitted' : 'pending');
+    console.log("task:", task, task.submissionLink && task.submissionLink !== '*' ? 'submitted' : 'pending');
 
     div.innerHTML = `
         <div class="task-header" onclick="toggleTaskDetails(this)">
@@ -504,12 +505,12 @@ function createTaskElement(task, member) {
             <p>DeadLinePercent: ${typeof task.deadlinePercent !== "undefined" ? task.deadlinePercent : ""}%</p>
             ${task.submissionLink && task.submissionLink !== '*' ? `
                 <p>Submitted: ${task.submissionDate ? new Date(task.submissionDate).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'numeric',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                }) : ""}</p>
+        year: 'numeric',
+        month: 'numeric',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    }) : ""}</p>
                 <p><a href="${task.submissionLink}" target="_blank">View Submission</a></p>
                 ${task.submissionFileId && task.downloadSubmissionUrl ? `<button id="${task.submissionFileId}">download Task solution </button>` : ""}
                 ${task.submissionFileId ? `
@@ -521,24 +522,22 @@ function createTaskElement(task, member) {
                 <p>task rate : ${typeof task.rate !== "undefined" ? task.rate : ""}</p>
             ` : ''}
             <div class="task-actions">
-                ${
-                    !(task.submissionLink && task.submissionLink !== '*') 
-                    ? `<button onclick="editTask('${member._id}', '${task._id}')" 
+                ${!(task.submissionLink && task.submissionLink !== '*')
+            ? `<button onclick="editTask('${member._id}', '${task._id}')" 
                         style="background-color: var(--primary-color); color: white;">Edit</button>`
-                    : ''
-                }
-                ${
-                    !(task.submissionLink && task.submissionLink !== '*') 
-                    ? `<button onclick="deleteTask('${member._id}', '${task._id}')"
+            : ''
+        }
+                ${!(task.submissionLink && task.submissionLink !== '*')
+            ? `<button onclick="deleteTask('${member._id}', '${task._id}')"
                         style="background-color: var(--danger-color); color: white;">Delete</button>`
-                    : ''
-                }
+            : ''
+        }
                 <button onclick="rateTask('${member._id}', '${task._id}')"
                     style="background-color: var(--success-color); color: white;">Rate</button>
             </div>
         </div>
     `;
-                
+
     return div;
 }
 
@@ -547,8 +546,7 @@ window.toggleTaskDetails = toggleTaskDetails;
 function toggleTaskDetails(header) {
     const content = header.nextElementSibling;
     const parent = header.parentElement;
-    if(parent.style.zIndex == 10) 
-    {
+    if (parent.style.zIndex == 10) {
         parent.style.zIndex = 0;
     }
     else {
@@ -563,22 +561,22 @@ function filterTasks() {
     const status = statusFilter.value;
     const startDate = startDateFilter.value;
     const endDate = endDateFilter.value;
-    
+
     submittedTasksList.innerHTML = '';
     pendingTasksList.innerHTML = '';
-    
+
     members.forEach(member => {
         if (!memberId || member._id === memberId) {
             member.tasks.forEach(task => {
                 const taskDate = new Date(task.deadline);
                 const isInDateRange = (!startDate || taskDate >= new Date(startDate)) &&
-                                    (!endDate || taskDate <= new Date(endDate));
+                    (!endDate || taskDate <= new Date(endDate));
                 const isSubmitted = task.submissionLink && task.submissionLink !== '*';
-                
-                if (isInDateRange && 
-                    (!status || 
-                    (status === 'submitted' && isSubmitted) || 
-                    (status === 'pending' && !isSubmitted))) {
+
+                if (isInDateRange &&
+                    (!status ||
+                        (status === 'submitted' && isSubmitted) ||
+                        (status === 'pending' && !isSubmitted))) {
                     const taskElement = createTaskElement(task, member);
                     if (isSubmitted) {
                         submittedTasksList.appendChild(taskElement);
@@ -600,7 +598,7 @@ endDateFilter.addEventListener('change', filterTasks);
 // Add Task
 document.getElementById('taskForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-    
+
     const formData = {
         title: document.getElementById('taskTitle').value,
         description: document.getElementById('taskDescription').value,
@@ -610,7 +608,7 @@ document.getElementById('taskForm').addEventListener('submit', async (e) => {
         startDate: document.getElementById('taskStartDate').value,
         deadline: document.getElementById('taskEndDate').value
     };
-    
+
     const assignedMembers = Array.from(document.querySelectorAll('.member-checkbox input:checked'))
         .map(checkbox => checkbox.value);
 
@@ -620,9 +618,8 @@ document.getElementById('taskForm').addEventListener('submit', async (e) => {
     }
 
     try {
-        const promises = assignedMembers.map(memberId => 
-        {
-          return  fetch(`${baseUrl}/members/${memberId}/addTask`, {
+        const promises = assignedMembers.map(memberId =>
+            fetch(APIConfig.getMembersEndpoint(`/${memberId}/addTask`), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -630,11 +627,11 @@ document.getElementById('taskForm').addEventListener('submit', async (e) => {
                 },
                 body: JSON.stringify(formData)
             }).then(res => res.json())
-        });
+        );
 
         const results = await Promise.all(promises);
         console.log(results);
-        
+
         const failures = results.filter(result => result.status === 'fail');
 
         if (failures.length > 0) {
@@ -675,7 +672,7 @@ document.getElementById('taskForm').addEventListener('submit', async (e) => {
 // async function editTask(memberId, taskId) {
 //     const member = members.find(m => m._id === memberId);
 //     const task = member?.tasks.find(t => t._id === taskId);
-    
+
 //     if (!task) return;
 
 //     const newTitle = prompt('Enter new title:', task.title);
@@ -702,7 +699,7 @@ document.getElementById('taskForm').addEventListener('submit', async (e) => {
 //     };
 
 //     try {
-//         const response = await fetch(`https://assiut-robotics-zeta.vercel.app/members/${memberId}/editTask/${taskId}`, {
+//         const response = await fetch(ServerConfig.getMembersEditTask(memberId, taskId), {
 //             method: 'PUT',
 //             headers: {
 //                 'Content-Type': 'application/json',
@@ -712,7 +709,7 @@ document.getElementById('taskForm').addEventListener('submit', async (e) => {
 //         });
 
 //         const data = await response.json();
-        
+
 //         if (data.status === 'fail') {
 //             throw new Error(data.message);
 //         }
@@ -729,7 +726,7 @@ window.deleteTask = async function deleteTask(memberId, taskId) {
     if (!confirm('Are you sure you want to delete this task?')) return;
 
     try {
-        const response = await fetch(`${baseUrl}/members/${memberId}/deleteTask/${taskId}`, {
+        const response = await fetch(APIConfig.getMembersEndpoint(`/${memberId}/deleteTask/${taskId}`), {
             method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -737,7 +734,7 @@ window.deleteTask = async function deleteTask(memberId, taskId) {
         });
 
         const data = await response.json();
-        
+
         if (!response.ok) {
             Toastify({
                 text: 'Error deleting task: ' + data.message,
@@ -758,7 +755,7 @@ window.deleteTask = async function deleteTask(memberId, taskId) {
             position: "right",
             backgroundColor: "#4CAF50",
         }).showToast();
-        await fetchMembers  ();
+        await fetchMembers();
     } catch (error) {
         Toastify({
             text: 'Error deleting task: ' + error.message,
@@ -772,7 +769,7 @@ window.deleteTask = async function deleteTask(memberId, taskId) {
 }
 
 // Rate Task
-window.rateTask = async function(memberId, taskId) {
+window.rateTask = async function (memberId, taskId) {
     // const isHead = prompt('Are you the head enter 1  for head, enter 0  for HR');
     const rating = prompt('Enter rating (1-100):');
 
@@ -782,15 +779,15 @@ window.rateTask = async function(memberId, taskId) {
     }
 
     const ratingData = {
-        headEvaluation:  parseInt(rating) ,
+        headEvaluation: parseInt(rating),
         // hrEvaluation: isHead!=1 ? parseInt(rating) : -1
     };
 
     console.log(ratingData);
-    
-    
+
+
     try {
-        const response = await fetch(`${baseUrl}/members/${memberId}/rateTask/${taskId}`, {
+        const response = await fetch(APIConfig.getMembersEndpoint(`/members/${memberId}/rateTask/${taskId}`), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -800,17 +797,17 @@ window.rateTask = async function(memberId, taskId) {
         });
 
         const data = await response.json();
-        
+
         if (!response.ok) {
-           Toastify({
-               text: 'Error rating task: ' + data.message,
-               duration: 3000,
-               close: true,
-               gravity: "top",
-               position: "right",
-               backgroundColor: "#f44336",
-           }).showToast();
-           throw new Error(data.message);
+            Toastify({
+                text: 'Error rating task: ' + data.message,
+                duration: 3000,
+                close: true,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "#f44336",
+            }).showToast();
+            throw new Error(data.message);
         }
         Toastify({
             text: 'Task rated successfully!',
@@ -840,17 +837,17 @@ window.rateTask = async function(memberId, taskId) {
 
 function editTask(memberId, taskId) {
     console.log(members);
-    
+
     const member = members.find(m => m._id === memberId);
     if (member) {
         const task = member.tasks.find(t => t._id === taskId);
         console.log(task);
-        
+
         if (task) {
             // Example: Open a modal or form to edit the task
-            openEditTaskPopup(task, memberId, taskId,member);
-            }
+            openEditTaskPopup(task, memberId, taskId, member);
         }
+    }
 }
 
 function openEditTaskPopup(task, memberId, taskId, member) {
@@ -874,20 +871,20 @@ function openEditTaskPopup(task, memberId, taskId, member) {
     form.onsubmit = function (event) {
         event.preventDefault();
         console.log('sumbsad');
-        
+
         // Get updated values from the form
         const updatedTask = {
             newTitle: document.getElementById('editTitle').value,
             newDescription: document.getElementById('editDescription').value,
-            StartDate: document.getElementById('editStartDate').value , // Convert to ISO format
-            deadline: document.getElementById('editDeadline').value , // Convert to ISO format
+            StartDate: document.getElementById('editStartDate').value, // Convert to ISO format
+            deadline: document.getElementById('editDeadline').value, // Convert to ISO format
             taskUrl: document.getElementById('editTaskUrl').value,
             points: document.getElementById('editPoints').value,
             // headPercent: document.getElementById('editHeadPercent').value,
-        }; 
+        };
         console.log('bef f');
-        
-        if (updatedTask.newTitle && updatedTask.newDescription && updatedTask.StartDate && updatedTask.deadline && updatedTask.taskUrl && updatedTask.points ) {
+
+        if (updatedTask.newTitle && updatedTask.newDescription && updatedTask.StartDate && updatedTask.deadline && updatedTask.taskUrl && updatedTask.points) {
             task.title = updatedTask.newTitle;
             task.description = updatedTask.newDescription;
             task.startDate = updatedTask.StartDate;
@@ -897,73 +894,73 @@ function openEditTaskPopup(task, memberId, taskId, member) {
             // task.headPercent = updatedTask.headPercent;
             // task.hrPercent = 100 - updatedTask.headPercent;
             console.log(task);
-            
-            editrequest(memberId,taskId,member);
+
+            editrequest(memberId, taskId, member);
             // Close the popup
             closePopup();
         }
-}
+    }
 
 
 
-    
+
 }
 
 // Function to update the task
-async function editrequest(memberId,taskId,member){
-    fetch(`${baseUrl}/members/${memberId}/editTask/${taskId}`, {
+async function editrequest(memberId, taskId, member) {
+    fetch(APIConfig.getMembersEndpoint(`/${memberId}/editTask/${taskId}`), {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
             'authorization': `Bearer ${token}`
         },
         body: JSON.stringify(member.tasks.find(t => t._id === taskId))
-    }).then(response =>response.json()
-        
+    }).then(response => response.json()
+
     )
-    .then(data => {
-        Toastify({
-            text: 'Task updated successfully!',
-            duration: 3000,
-            close: true,
-            gravity: "top",
-            position: "right",
-            backgroundColor: "#4CAF50",
-        }).showToast();
-        console.log('Success:', data);
-        // displayTasks(member.tasks, memberId); // Refresh the task list
-        if(data.message=='jwt expired'){
+        .then(data => {
             Toastify({
-                text: 'Session expired. Please log in again.',
+                text: 'Task updated successfully!',
+                duration: 3000,
+                close: true,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "#4CAF50",
+            }).showToast();
+            console.log('Success:', data);
+            // displayTasks(member.tasks, memberId); // Refresh the task list
+            if (data.message == 'jwt expired') {
+                Toastify({
+                    text: 'Session expired. Please log in again.',
+                    duration: 3000,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: "#f44336",
+                }).showToast();
+                window.location.href = '../login/login.html'
+            }
+            Toastify({
+                text: data.message,
                 duration: 3000,
                 close: true,
                 gravity: "top",
                 position: "right",
                 backgroundColor: "#f44336",
             }).showToast();
-            window.location.href='../login/login.html'
+            fetchMembers()
         }
-        Toastify({
-            text: data.message,
-            duration: 3000,
-            close: true,
-            gravity: "top",
-            position: "right",
-            backgroundColor: "#f44336",
-        }).showToast();
-        fetchMembers()
-    }
-).catch(error => {
-        console.error('Error updating task:', error.message);
-        Toastify({
-            text: 'Error updating task: ' + error.message,
-            duration: 3000,
-            close: true,
-            gravity: "top",
-            position: "right",
-            backgroundColor: "#f44336",
-        }).showToast();
-    })
+        ).catch(error => {
+            console.error('Error updating task:', error.message);
+            Toastify({
+                text: 'Error updating task: ' + error.message,
+                duration: 3000,
+                close: true,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "#f44336",
+            }).showToast();
+        })
 }
 // Function to close the popup
 function closePopup() {
@@ -1000,10 +997,10 @@ if (currentTheme) {
 themeToggle.addEventListener('click', () => {
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
     const newTheme = isDark ? 'light' : 'dark';
-    
+
     document.documentElement.setAttribute('data-theme', newTheme);
     localStorage.setItem('theme', newTheme);
-    
+
     // تحديث أيقونة التبديل
     updateToggleIcon(newTheme);
 });
@@ -1012,7 +1009,7 @@ themeToggle.addEventListener('click', () => {
 function updateToggleIcon(theme) {
     const lightIcon = document.querySelector('.light-icon');
     const darkIcon = document.querySelector('.dark-icon');
-    
+
     if (theme === 'dark') {
         lightIcon.style.display = 'none';
         darkIcon.style.display = 'inline';
@@ -1037,94 +1034,94 @@ fetchMembers();
 
 // HrEvaluationSection
 async function fetchMembersForHr() {
-  
+
     // localStorage.setItem("data", JSON.stringify({ role: "HR web" }));
     let userData = localStorage.getItem("data");
     let parsedData = JSON.parse(userData);
     let hrRole = parsedData.role;
-    let words = hrRole.split(" "); 
+    let words = hrRole.split(" ");
     let hrCommitte = words.length > 1 ? words[1] : "Not found";
     // console.log(hrCommitte);
-    if(hrCommitte !="Not found"){
+    if (hrCommitte != "Not found") {
         try {
-      const response = await fetch(`${baseUrl}/members/get/${hrCommitte}`);
-      const data = await response.json();
-      if (response.ok) {
+            const response = await fetch(APIConfig.getMembersEndpoint(`/get/${hrCommitte}`));
+            const data = await response.json();
+            if (response.ok) {
+                Toastify({
+                    text: 'Members fetched successfully',
+                    duration: 3000,
+                    close: true,
+                    gravity: "top",
+                    position: "right",
+                    backgroundColor: "#4caf50",
+                }).showToast();
+                let members = data.date;
+
+                // console.log(members);
+                let memberSelect = document.getElementById("memberId");
+                memberSelect.innerHTML = '<option value=""> Select Member</option>';
+                members.forEach(member => {
+                    memberSelect.innerHTML += `<option value="${member._id}">${member.name}</option>`;
+                });
+            }
+        } catch (error) {
+            console.error('Error fetching members:', error);
             Toastify({
-                text: 'Members fetched successfully',
+                text: 'Error fetching members: ' + error.message,
+                duration: 3000,
+                close: true,
+                gravity: "top",
+                position: "right",
+                backgroundColor: "#f44336",
+            }).showToast();
+        }
+    }
+}
+
+fetchMembersForHr();
+
+document.getElementById('evaluationForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+
+    const formData = {
+        month: document.getElementById('month').value,
+        memberId: document.getElementById('memberId').value,
+        meetingScore: Number(document.getElementById('meetingScore').value),
+        behaviorScore: Number(document.getElementById('behaviorScore').value),
+        interactionScore: Number(document.getElementById('interactionScore').value)
+    };
+    const messageDiv = document.getElementById('message');
+    // console.log(JSON.stringify(formData));
+
+    try {
+        const response = await fetch(APIConfig.getMembersEndpoint('/update-tasks-evaluation'), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        });
+
+        if (response.ok) {
+            Toastify({
+                text: 'Evaluation submitted successfully',
                 duration: 3000,
                 close: true,
                 gravity: "top",
                 position: "right",
                 backgroundColor: "#4caf50",
             }).showToast();
-          let members = data.date;
+            messageDiv.textContent = 'Evaluation submitted successfully';
+            messageDiv.className = 'message success';
+            e.target.reset();
 
-          // console.log(members);
-          let memberSelect = document.getElementById("memberId");
-          memberSelect.innerHTML = '<option value=""> Select Member</option>';
-          members.forEach(member => {
-            memberSelect.innerHTML += `<option value="${member._id}">${member.name}</option>`;
-          });
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 5000);
+        } else {
+            throw new Error('Error submitting evaluation');
         }
-    } catch (error) {
-      console.error('Error fetching members:', error);
-      Toastify({
-          text: 'Error fetching members: ' + error.message,
-          duration: 3000,
-          close: true,
-          gravity: "top",
-          position: "right",
-          backgroundColor: "#f44336",
-      }).showToast();
-    }
-    }
-  }
-  
-  fetchMembersForHr();
-  
-  document.getElementById('evaluationForm').addEventListener('submit', async function (e) {
-    e.preventDefault();
-  
-  
-    const formData = {
-      month: document.getElementById('month').value,
-      memberId: document.getElementById('memberId').value,
-      meetingScore: Number(document.getElementById('meetingScore').value),
-      behaviorScore: Number(document.getElementById('behaviorScore').value),
-      interactionScore: Number(document.getElementById('interactionScore').value)
-    };
-    const messageDiv = document.getElementById('message');
-    // console.log(JSON.stringify(formData));
-  
-    try {
-      const response = await fetch(`${baseUrl}/members/update-tasks-evaluation`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formData)
-      });
-  
-      if (response.ok) {
-        Toastify({
-            text: 'Evaluation submitted successfully',
-            duration: 3000,
-            close: true,
-            gravity: "top",
-            position: "right",
-            backgroundColor: "#4caf50",
-        }).showToast();
-        messageDiv.textContent = 'Evaluation submitted successfully';
-        messageDiv.className = 'message success';
-        e.target.reset();
-  
-        setTimeout(() => {
-          messageDiv.style.display = 'none';
-        }, 5000);
-      } else {
-        throw new Error('Error submitting evaluation');
-      }
     } catch (error) {
         Toastify({
             text: 'Error submitting evaluation: ' + error.message,
@@ -1134,7 +1131,7 @@ async function fetchMembersForHr() {
             position: "right",
             backgroundColor: "#f44336",
         }).showToast();
-      messageDiv.textContent = 'Error submitting evaluation';
-      messageDiv.className = 'message error';
+        messageDiv.textContent = 'Error submitting evaluation';
+        messageDiv.className = 'message error';
     }
-  });
+});

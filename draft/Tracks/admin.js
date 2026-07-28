@@ -1,5 +1,5 @@
-// Global variable for server URL
-const serverUrl = 'https://assiut-robotics-zeta.vercel.app/Tracks/api';
+// Use dynamic server URL based on environment
+const serverUrl = serverConfig.getApiUrl('Tracks/api');
 
 // State management
 let tracks = [];
@@ -86,7 +86,7 @@ async function getTasks(trackId, courseId) {
 
 async function getCourseMembers(courseId) {
   try {
-    const response = await fetch(`https://assiut-robotics-zeta.vercel.app/members/getMembersJoinedCourse/${courseId}`, {
+    const response = await fetch(serverConfig.getApiUrl(`members/getMembersJoinedCourse/${courseId}`), {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

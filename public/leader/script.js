@@ -1,17 +1,20 @@
-// Use global API_BASE_URL defined in config/server-config.js
-const mainURL = API_BASE_URL;
+// const mainURL = "https://assiut-robotics-zeta.vercel.app";
+
+const mainURL = ServerConfig.getMainAPI();
+
+let members = [];
 
 async function fetchCommittees() {
     try {
         // Fetch the data from the API
-        const response = await fetch(`${mainURL}/members/getAllMembers`);
+        const response = await fetch(ServerConfig.getMembersGetAll());
 
         // Parse the response as JSON
         const data = await response.json();
 
         // Check if the response status is "success" and extract members
         if (data.status === "success" && data.data && data.data.members) {
-            const members = data.data.members;
+            members = data.data.members;
             console.log("Members:", members);
             return members;
         } else {
@@ -39,6 +42,14 @@ function renderTabs(committees) {
     });
 }
 
+function compareIDs(memberID) {
+    const adminData = JSON.parse(localStorage.getItem('data'));
+    const id = adminData._id;
+    if (memberID === id) {
+        return true;
+    }
+    return false;
+}
 
 function renderContainers(committees) {
     const containers = document.getElementById('containers');
@@ -62,7 +73,7 @@ function renderContainers(committees) {
 
         const committee = committees[committeeName]
 
-        console.log(committee);
+        // console.log(committee);
 
         // Add "Members" section
         const membersHeading = document.createElement('h3');
@@ -70,27 +81,32 @@ function renderContainers(committees) {
         container.appendChild(membersHeading);
 
         if (committee && committee.length > 0) {
-            const order = { head: 1, vice: 2, member: 3, "not accepted" : 4 };
+            const order = {
+                [AppConstants.MEMBER_ROLES.HEAD]: 1,
+                [AppConstants.MEMBER_ROLES.VICE]: 2,
+                [AppConstants.MEMBER_ROLES.MEMBER]: 3,
+                [AppConstants.MEMBER_ROLES.NOT_ACCEPTED]: 4
+            };
             // Sort by custom order
             committee.sort((a, b) => order[a.role] - order[b.role]);
             console.log(committee);
-            
+
             committee.forEach(member => {
                 const memberCard = document.createElement('div');
                 memberCard.className = 'card';
 
-                if (member.role !== "not accepted" && member.committee != "manager") {
+                if (member.role !== AppConstants.MEMBER_ROLES.NOT_ACCEPTED && member.committee != AppConstants.COMMITTEES.MANAGER) {
                     memberCard.innerHTML = `
-                        <p>${member.name} (${member.role})</p>
-                        <button onclick="approveMember('${member.name}','${member.email}', 'false')">Remove</button>
-                        ${member.role !== 'head'
+                        <p>${member.name} (${member.role}) ${compareIDs(member._id) ? '<span style="color: #1e88e5ff"><b> (You)</b></span>' : ''}</p>
+                        ${!compareIDs(member._id) ? `<button onclick="approveMember('${member.name}','${member.email}', 'false')">Remove</button>` : ''}
+                        ${member.role !== AppConstants.MEMBER_ROLES.HEAD && !compareIDs(member._id)
                             ? `<button onclick="setHead('${member._id}')">Set Head</button>`
                             : ''
                         }
-                        ${member.role !== 'vice' ? `<button onclick="setVice('${member._id}')">Set Vice</button>` : ''}
+                        ${member.role !== AppConstants.MEMBER_ROLES.VICE && !compareIDs(member._id) ? `<button onclick="setVice('${member._id}')">Set Vice</button>` : ''}
                         <button onclick="showMemberInfo(${JSON.stringify(member).replace(/"/g, '&quot;')})">Show Info</button>
                     `;
-                } else if(  member.committee != "manager") {
+                } else if (member.committee != "manager") {
                     memberCard.innerHTML = `
                         <p>${member.name} (${member.role})</p>
                         <button onclick="approveMember('${member.name}','${member.email}', 'true')">Accept</button>
@@ -98,8 +114,8 @@ function renderContainers(committees) {
                         <button onclick="showMemberInfo(${JSON.stringify(member).replace(/"/g, '&quot;')})">Show Info</button>
                     `;
                 }
-                else{
-                      memberCard.innerHTML = `
+                else {
+                    memberCard.innerHTML = `
                         <p>${member.name} (${member.role})</p>
                         <button onclick="showMemberInfo(${JSON.stringify(member).replace(/"/g, '&quot;')})">Show Info</button>
                     `;
@@ -113,27 +129,27 @@ function renderContainers(committees) {
         }
 
         // Add "Pending" section
-        // const pendingHeading = document.createElement('h3');
-        // pendingHeading.textContent = 'Pending';
-        // container.appendChild(pendingHeading);
+        const pendingHeading = document.createElement('h3');
+        pendingHeading.textContent = 'Pending';
+        container.appendChild(pendingHeading);
 
-        // if (committee.pending && committee.pending.length > 0) {
-        //     committee.pending.forEach(pending => {
-        //         const pendingCard = document.createElement('div');
-        //         pendingCard.className = 'card pending';
+        if (committee.pending && committee.pending.length > 0) {
+            committee.pending.forEach(pending => {
+                const pendingCard = document.createElement('div');
+                pendingCard.className = 'card pending';
 
-        //         pendingCard.innerHTML = `
-        //             <p>${pending.name}</p>
-        //             <button onclick="approveMember(${committee.id}, '${pending._id}')">Approve</button>
-        //         `;
-        //         container.appendChild(pendingCard);
-        //     });
-        //     renderMember(member, memberContainer)
-        // } else {
-        //     const noPendingMessage = document.createElement('p');
-        //     noPendingMessage.textContent = 'No pending members.';
-        //     container.appendChild(noPendingMessage);
-        // }
+                pendingCard.innerHTML = `
+                    <p>${pending.name}</p>
+                    <button onclick="approveMember(${committee.id}, '${pending._id}')">Approve</button>
+                `;
+                container.appendChild(pendingCard);
+            });
+            renderMember(member, memberContainer)
+        } else {
+            const noPendingMessage = document.createElement('p');
+            noPendingMessage.textContent = 'No pending members.';
+            container.appendChild(noPendingMessage);
+        }
 
         // Append the container to the parent element
         containers.appendChild(container);
@@ -142,7 +158,7 @@ function renderContainers(committees) {
 
 function showMemberInfo(member) {
     console.log(member);
-    
+
     const infoContainer = document.getElementById('member-info');
     console.log(infoContainer);
     infoContainer.style.display = 'block'; // Show the info container
@@ -152,6 +168,7 @@ function showMemberInfo(member) {
         <div class="info-card">
             <img src="${member.avatar}" alt="${member.name}" class="avatar" />
             <h2>${member.name}</h2>
+            <p><strong>Id:</strong> ${member._id}</p>
             <p><strong>Email:</strong> ${member.email}</p>
             <p><strong>Committee:</strong> ${member.committee}</p>
             <p><strong>Gender:</strong> ${member.gender}</p>
@@ -161,13 +178,13 @@ function showMemberInfo(member) {
         </div>
     `;
 }
-function closeInfo(){
+function closeInfo() {
     document.getElementById('member-info').style.display = 'none';
 }
 function categorizeMembersByCommittee(members) {
     // Initialize an empty object to hold categorized members
-    console.log("categorizeMembersByCommittee");
-    
+    // console.log("categorizeMembersByCommittee");
+
     const categorizedMembers = {};
 
     members.forEach(member => {
@@ -181,8 +198,9 @@ function categorizeMembersByCommittee(members) {
         // Push the member into the corresponding committee array
         categorizedMembers[committee].push(member);
     });
-    console.log("Catigorized members",categorizedMembers);
     
+    // console.log("Catigorized members", categorizedMembers);
+
     return categorizedMembers;
 }
 
@@ -199,6 +217,7 @@ function renderMember(member, memberContainer) {
     card.innerHTML = `
         <img src="${member.avatar}" alt="${member.name}" class="avatar">
         <h2>${member.name}</h2>
+       
         <p><strong>Email:</strong> ${member.email}</p>
         <p><strong>Committee:</strong> ${member.committee}</p>
         <p><strong>Gender:</strong> ${member.gender}</p>
@@ -228,86 +247,92 @@ async function removeMember(committeeId, memberId) {
     location.reload();
 }
 
-async function approveMember(name,email, accepted) {
-    var answer =window.prompt(`are sure you want to ${accepted ? "accept" : "remove"} ${name} `, "N")
-    if(answer == 'N'){return}
+async function approveMember(name, email, accepted) {
+    var answer = window.prompt(`are sure you want to ${accepted ? "accept" : "remove"} ${name} `, "N")
+    if (answer == 'N') { return }
     if (answer === null) {
         // User pressed Cancel
         return;
     }
     try {
-        
-        console.log(email,accepted);
-        
-    const token=window.localStorage.getItem('token')
-    const res=await fetch(`${mainURL}/members/confirm`, {
-        method: 'POST',
-        headers: {
-             'Content-Type': 'application/json',
-             'authorization':`Bearer ${token}`
-            
+
+        console.log(email, accepted);
+
+        const token = window.localStorage.getItem('token')
+        // const res=await fetch(`https://assiut-robotics-zeta.vercel.app/members/confirm`, {
+
+        const res = await fetch(ServerConfig.getMembersConfirm(), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'authorization': `Bearer ${token}`
+
             },
-        body: JSON.stringify({email,accepted})
-    });
-    const response=await res.json();
-    if(response.message == "jwt expired")
-    {
-        window.location.href = "../login/login.html"
+            body: JSON.stringify({ email, accepted })
+        });
+        const response = await res.json();
+        if (response.message == "jwt expired") {
+            window.location.href = "../login/login.html"
+        }
+        alert(response.message)
+        console.log(response);
+
+        // location.reload();
+    } catch (error) {
+        window.alert(error.message)
+        console.log(error);
+
     }
-    alert(response.message)
-    console.log(response);
-    
-    // location.reload();
-} catch (error) {
-       window.alert(error.message) 
-       console.log(error);
-       
-}
 }
 
 async function setHead(memberId) {
-    const token=window.localStorage.getItem('token')
+    const token = window.localStorage.getItem('token')
 
-    try{
-    const res=await fetch(`${mainURL}/members/changeHead`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'authorization':`Bearer ${token}`
-           
-           },
-        body: JSON.stringify({ memberId })
-    });
-    const response=await res.json();
-    alert(response.message)
-    console.log(response);
-    
-    location.reload();
-} catch (error) {
-       window.alert(error.message) 
+    try {
+        // const res=await fetch(`https://assiut-robotics-zeta.vercel.app/members/changeHead`, {
+
+        const res = await fetch(ServerConfig.getMembersChangeHead(), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'authorization': `Bearer ${token}`
+
+            },
+            body: JSON.stringify({ memberId })
+        });
+        const response = await res.json();
+        alert(response.message)
+        console.log(response);
+
+        location.reload();
+    } catch (error) {
+        window.alert(error.message)
+    }
 }
-}
+
 async function setVice(memberId) {
-    const token=window.localStorage.getItem('token')
+    const token = window.localStorage.getItem('token')
 
-    try{
-    const res=await fetch(`${mainURL}/members/changeVice`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'authorization':`Bearer ${token}`
-           
-           },
-        body: JSON.stringify({ memberId })
-    });
-    const response=await res.json();
-    alert(response.message)
-    console.log(response);
-    
-    location.reload();
-} catch (error) {
-       window.alert(error.message) 
-}
+    try {
+        // const res=await fetch(`https://assiut-robotics-server.vercel.app/members/changeVice`, {
+
+        const res = await fetch(ServerConfig.getMembersChangeVice(), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'authorization': `Bearer ${token}`
+
+            },
+            body: JSON.stringify({ memberId })
+        });
+        const response = await res.json();
+        alert(response.message)
+        console.log(response);
+
+        location.reload();
+    } catch (error) {
+        window.alert(error.message)
+    }
 }
 
 
@@ -321,7 +346,11 @@ async function startPage() {
     renderContainers(committees);
 }
 
-window.onload = function (e) {
-    console.log("Leaders Page: window.onload");
+
+// Initialize the page
+window.addEventListener('load', () => {
+    //displayTeamMembers();
+    // console.log("Leaders Page: window.onload");
     startPage();
-}
+    console.log("Leader page initialized and team members displayed.");
+});

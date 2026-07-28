@@ -1,0 +1,263 @@
+[
+  {
+    "id": "high-board",
+    "title": "High Board",
+    "members": [
+      {
+        "name": "Ibrahim Sayed",
+        "role": "Vice Team Leader",
+        "image": "./all-images/board/vice-team-leader1.jpg",
+        "cardClass": "high-board-card-vice"
+      },
+      {
+        "name": "Ahmed Eid",
+        "role": "Team Leader",
+        "image": "./all-images/board/team-leader.jpg",
+        "cardClass": "high-board-card",
+        "bio": "Leading the team towards innovation and success.",
+        "email": "ahmed.eid@example.com",
+        "date": "Since 2023"
+      },
+      {
+        "name": "Name Here",
+        "role": "Vice Team Leader",
+        "image": "./all-images/default.png",
+        "cardClass": "high-board-card-vice"
+      }
+    ]
+  },
+  {
+    "id": "software",
+    "title": "Software Team",
+    "members": [
+      {
+        "name": "Name Here",
+        "role": "Software Vice",
+        "image": "./all-images/web.jpg",
+        "cardClass": "vice-card"
+      },
+      {
+        "name": "Anthony Gaius",
+        "role": "Software Head",
+        "image": "./all-images/board/software-head.jpg",
+        "cardClass": "lead-card"
+      },
+      {
+        "name": "Name Here",
+        "role": "Software Vice",
+        "image": "./all-images/web.jpg",
+        "cardClass": "vice-card"
+      },
+      {
+        "name": "Mazen Magdy",
+        "role": "Frontend Sub-head",
+        "image": "./all-images/board/frontend-subhead.jpg",
+        "cardClass": "member-card software-card"
+      },
+      {
+        "name": "Mostafa Ahmed",
+        "role": "Backend Sub-head",
+        "image": "./all-images/board/backend-subhead.jpg",
+        "cardClass": "member-card software-card"
+      },
+      {
+        "name": "Mahmoud Mohamed Joma",
+        "role": "UI/UX Sub-head",
+        "image": "./all-images/web.jpg",
+        "cardClass": "member-card software-card"
+      },
+      {
+        "name": "Karen Medhat",
+        "role": "Application Sub-head",
+        "image": "./all-images/web.jpg",
+        "cardClass": "member-card software-card"
+      }
+    ]
+  },
+  {
+    "id": "ac-electrical",
+    "title": "AC Electrical Team",
+    "members": [
+      {
+        "name": "Name Here",
+        "role": "Electrical Vice Head",
+        "image": "./all-images/default.png",
+        "cardClass": "vice-card"
+      },
+      {
+        "name": "Arwa Hassan",
+        "role": "Electrical Head",
+        "image": "./all-images/default.png",
+        "cardClass": "lead-card"
+      },
+      {
+        "name": "Afaf Sayed",
+        "role": "Electrical Vice Head",
+        "image": "./all-images/default.png",
+        "cardClass": "vice-card"
+      },
+      {
+        "name": "Afaf Sayed",
+        "role": "Hardware Sub-head",
+        "image": "./all-images/default.png",
+        "cardClass": "member-card"
+      },
+      {
+        "name": "Name Here",
+        "role": "Embedded Sub-head",
+        "image": "./all-images/default.png",
+        "cardClass": "member-card"
+      },
+      {
+        "name": "Ahmed Nady",
+        "role": "Autonomous Sub-Head",
+        "image": "./all-images/default.png",
+        "cardClass": "member-card"
+      }
+    ]
+  },
+  {
+    "id": "ac-mechanical",
+    "title": "AC Mechanical Team",
+    "members": [
+      {
+        "name": "Name Here",
+        "role": "Mechanical Vice Head",
+        "image": "./all-images/default.png",
+        "cardClass": "vice-card"
+      },
+      {
+        "name": "Diaa Hassan",
+        "role": "Mechanical Head",
+        "image": "./all-images/board/mechanical-head.jpg",
+        "cardClass": "lead-card"
+      },
+      {
+        "name": "Taha Sarhan",
+        "role": "Mechanical Vice Head",
+        "image": "./all-images/default.png",
+        "cardClass": "vice-card"
+      }
+    ]
+  },
+  {
+    "id": "hr",
+    "title": "Human Resources",
+    "members": [
+      {
+        "name": "Malak Mahmoud Korashy",
+        "role": "HR Vice Head",
+        "image": "./all-images/hr.jpg",
+        "cardClass": "vice-card"
+      },
+      {
+        "name": "Mohammed Ashraf",
+        "role": "HR Head",
+        "image": "./all-images/board/hr-head.jpg",
+        "cardClass": "lead-card"
+      },
+      {
+        "name": "Asmaa Hassan",
+        "role": "HR Vice Head",
+        "image": "./all-images/hr.jpg",
+        "cardClass": "vice-card"
+      },
+      {
+        "name": "Ahmed Ali",
+        "role": "HR Vice Head",
+        "image": "./all-images/hr.jpg",
+        "cardClass": "vice-card"
+      }
+    ]
+  },
+  {
+    "id": "pr",
+    "title": "Public Relations",
+    "members": [
+      {
+        "name": "Sarah Mohammed",
+        "role": "PR Vice Head",
+        "image": "./all-images/pr.jpg",
+        "cardClass": "vice-card"
+      },
+      {
+        "name": "Mariam Mahmoud",
+        "role": "PR Head",
+        "image": "./all-images/pr.jpg",
+        "cardClass": "lead-card"
+      },
+      {
+        "name": "Name Here",
+        "role": "PR Vice Head",
+        "image": "./all-images/pr.jpg",
+        "cardClass": "vice-card"
+      }
+    ]
+  },
+  {
+    "id": "oc",
+    "title": "Organizing Committee",
+    "members": [
+      {
+        "name": "Ahmed Essam fatehy",
+        "role": "OC Vice Head",
+        "image": "./all-images/board/oc-vice-head1.jpg",
+        "cardClass": "vice-card"
+      },
+      {
+        "name": "Amena Hassan",
+        "role": "OC Head",
+        "image": "./all-images/oc.jpg",
+        "cardClass": "lead-card"
+      },
+      {
+        "name": "Name Here",
+        "role": "OC Vice Head",
+        "image": "./all-images/oc.jpg",
+        "cardClass": "vice-card"
+      }
+    ]
+  },
+  {
+    "id": "digital-marketing",
+    "title": "Digital Marketing",
+    "members": [
+      {
+        "name": "Name Here",
+        "role": "Marketing Vice Head",
+        "image": "./all-images/marketing.jpg",
+        "cardClass": "vice-card"
+      },
+      {
+        "name": "Abeer AbdElaal",
+        "role": "Marketing Head",
+        "image": "./all-images/marketing.jpg",
+        "cardClass": "lead-card"
+      },
+      {
+        "name": "Name Here",
+        "role": "Marketing Vice Head",
+        "image": "./all-images/marketing.jpg",
+        "cardClass": "vice-card"
+      },
+      {
+        "name": "Mahmoud Mohamed Joma",
+        "role": "Graphic Design Sub-Head",
+        "image": "./all-images/marketing.jpg",
+        "cardClass": "member-card"
+      },
+      {
+        "name": "Mai Sayed",
+        "role": "Content and Marketing Sub-Head",
+        "image": "./all-images/marketing.jpg",
+        "cardClass": "member-card"
+      },
+      {
+        "name": "Ahmed Mahmoud Amin",
+        "role": "Video Editing and Photography Sub-Head",
+        "image": "./all-images/board/video-editing-subhead.jpg",
+        "cardClass": "member-card"
+      }
+    ]
+  }
+]

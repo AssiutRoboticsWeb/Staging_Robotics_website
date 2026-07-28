@@ -7,41 +7,67 @@ const heroSection = document.getElementById('home');
 const aboutSection = document.getElementById('about');
 const committeesSection = document.getElementById('committees');
 const contactSection = document.getElementById('contact');
+<<<<<<< Updated upstream
 function active(){
     var scrollPosition = window.scrollY+200; // Adjust offset as needed
     console.log(scrollPosition);
+=======
+function active() {
+    var scrollPosition = window.scrollY + 200; // Adjust offset as needed
+    // console.log(scrollPosition);
+>>>>>>> Stashed changes
     if (scrollPosition >= heroSection.offsetTop && scrollPosition < aboutSection.offsetTop) {
         // Hero Section
         heroSection_link.classList.add('active');
         aboutSection_link.classList.remove('active');
         committeesSection_link.classList.remove('active');
         contactSection_link.classList.remove('active');
+<<<<<<< Updated upstream
         console.log("hero active")
         console.log(heroSection_link.offsetTop)
+=======
+        // console.log("hero active")
+        // console.log(heroSection_link.offsetTop)
+>>>>>>> Stashed changes
     } else if (scrollPosition >= aboutSection.offsetTop && scrollPosition < committeesSection.offsetTop) {
         // About Section
         aboutSection_link.classList.add('active');
         heroSection_link.classList.remove('active');
         committeesSection_link.classList.remove('active');
         contactSection_link.classList.remove('active');
+<<<<<<< Updated upstream
         console.log("about active")
         console.log(aboutSection.offsetTop)
+=======
+        // console.log("about active")
+        // console.log(aboutSection.offsetTop)
+>>>>>>> Stashed changes
     } else if (scrollPosition >= committeesSection.offsetTop && scrollPosition < contactSection.offsetTop) {
         // Committees Section
         committeesSection_link.classList.add('active');
         heroSection_link.classList.remove('active');
         aboutSection_link.classList.remove('active');
         contactSection_link.classList.remove('active');
+<<<<<<< Updated upstream
         console.log("committees active")
         console.log(committeesSection.offsetTop)
+=======
+        // console.log("committees active")
+        // console.log(committeesSection.offsetTop)
+>>>>>>> Stashed changes
     } else if (scrollPosition >= contactSection.offsetTop) {
         // Contact Section
         contactSection_link.classList.add('active');
         heroSection_link.classList.remove('active');
         aboutSection_link.classList.remove('active');
         committeesSection_link.classList.remove('active');
+<<<<<<< Updated upstream
         console.log("contact active")
         console.log(contactSection_link.offsetTop)
+=======
+        // console.log("contact active")
+        // console.log(contactSection_link.offsetTop)
+>>>>>>> Stashed changes
     }
 }
 window.addEventListener('scroll', active);
@@ -66,6 +92,7 @@ const heroImages = [
 
 let currentImageIndex = 0;
 const hero = document.querySelector('.hero');
+<<<<<<< Updated upstream
 console.log(hero.before);
 
 
@@ -73,6 +100,15 @@ function changeHeroImage() {
     console.log(currentImageIndex);
     console.log(heroImages[currentImageIndex]);
     console.log(currentImageIndex % heroImages.length);
+=======
+// console.log(hero.before);
+
+
+function changeHeroImage() {
+    // console.log(currentImageIndex);
+    // console.log(heroImages[currentImageIndex]);
+    // console.log(currentImageIndex % heroImages.length);
+>>>>>>> Stashed changes
     hero.style.background = `url('${heroImages[currentImageIndex]}');`;
     currentImageIndex = (currentImageIndex + 1) % heroImages.length;
 }
@@ -275,7 +311,11 @@ const committeeDetails = {
                     <p>تعتبر لجنة البرمجيات هي المسؤولة عن تطوير وصيانة البرمجيات والتطبيقات التي تدعم أنشطة الفريق. تعمل اللجنة على تقديم حلول برمجية مبتكرة وفعالة من خلال اربعة أقسام متخصصة.</p>
                     
                     <div class="committee-tabs">
+<<<<<<< Updated upstream
                         <button class="tab-btn active" onclick="switchTab('frontend')">FrontEnd</button>
+=======
+                        <button class="tab-btn active" onclick="switchTab('frontend')">Frontend</button>
+>>>>>>> Stashed changes
                         <button class="tab-btn" onclick="switchTab('backend')">BackEnd</button>
                         <button class="tab-btn" onclick="switchTab('mobile')">Mobile</button>
                         <button class="tab-btn" onclick="switchTab('uiux')">UI/UX</button>
@@ -324,7 +364,11 @@ const committeeDetails = {
                             </li>
                             <li>
                                 <strong>توفير ال APIs المناسبه</strong>
+<<<<<<< Updated upstream
                                 <p>تصميم وتطوير واجهات برمجة التطبيقات (APIs) التي تضمن وصول المعلومات المناسبه لمطوري الFrontEnd , Mobile.</p>
+=======
+                                <p>تصميم وتطوير واجهات برمجة التطبيقات (APIs) التي تضمن وصول المعلومات المناسبه لمطوري الFrontend , Mobile.</p>
+>>>>>>> Stashed changes
                             </li>
                             <li>
                                 <strong>تأمين قاعدة البيانات</strong>
@@ -561,7 +605,11 @@ const committeeDetails = {
 const modal = document.getElementById('modal');
 const modalContent = document.getElementById('modal-content');
 const closeBtn = document.querySelector('.close');
+<<<<<<< Updated upstream
 document.addEventListener('DOMContentLoaded', function() {
+=======
+document.addEventListener('DOMContentLoaded', function () {
+>>>>>>> Stashed changes
 
 
     if (!modal || !modalContent || !closeBtn) {
@@ -575,14 +623,22 @@ document.addEventListener('DOMContentLoaded', function() {
     closeBtn.onclick = closeModal;
 
     // Close modal when clicking outside of modal
+<<<<<<< Updated upstream
     window.onclick = function(event) {
+=======
+    window.onclick = function (event) {
+>>>>>>> Stashed changes
         if (event.target == modal) {
             closeModal();
         }
     };
 
     // Close modal when pressing Escape key
+<<<<<<< Updated upstream
     document.addEventListener('keydown', function(event) {
+=======
+    document.addEventListener('keydown', function (event) {
+>>>>>>> Stashed changes
         if (event.key === 'Escape') {
             closeModal();
         }
@@ -602,7 +658,11 @@ function showDetails(committee) {
         console.error(`Details for committee ${committee} not found`);
         return;
     }
+<<<<<<< Updated upstream
     
+=======
+
+>>>>>>> Stashed changes
     modal.style.display = 'block';
     modalContent.innerHTML = committeeDetails[committee].content;
 }
@@ -621,14 +681,20 @@ function switchTab(tabName, parent = null) {
 
     const cardContent = document.querySelector(`#${parent} .committee-text #${tabName}-content`);
     const cardButton = document.querySelector(`#${parent} .committee-tabs [onclick="switchTab('${tabName}', '${parent}')"]`);
+<<<<<<< Updated upstream
     console.log(cardButton);
     
+=======
+    // console.log(cardButton);
+
+>>>>>>> Stashed changes
     if (cardContent) cardContent.classList.add('active');
     if (cardButton) cardButton.classList.add('active');
 
     // Handle modal tabs
     const modalContents = document.querySelectorAll('.modal .tab-content');
     const modalButtons = document.querySelectorAll('.modal .tab-btn');
+<<<<<<< Updated upstream
     
     modalContents.forEach(content => content.classList.remove('active'));
     modalButtons.forEach(button => button.classList.remove('active'));
@@ -636,6 +702,15 @@ function switchTab(tabName, parent = null) {
     const modalContent = document.querySelector(`.modal #${tabName}-content`);
     const modalButton = document.querySelector(`.modal [onclick="switchTab('${tabName}')"]`);
     
+=======
+
+    modalContents.forEach(content => content.classList.remove('active'));
+    modalButtons.forEach(button => button.classList.remove('active'));
+
+    const modalContent = document.querySelector(`.modal #${tabName}-content`);
+    const modalButton = document.querySelector(`.modal [onclick="switchTab('${tabName}')"]`);
+
+>>>>>>> Stashed changes
     if (modalContent) modalContent.classList.add('active');
     if (modalButton) modalButton.classList.add('active');
 }
@@ -658,6 +733,7 @@ const getClientIP = async () => {
 // send ip of the guest
 
 const sendIpApi = async (page) => {
+<<<<<<< Updated upstream
     try{
     const clientIP = await getClientIP();
     console.log("api function ", page, clientIP)
@@ -687,13 +763,48 @@ catch(error){
     console.log(error)
     return error;
 }
+=======
+    try {
+        const clientIP = await getClientIP();
+        // console.log("api function ", page, clientIP)
+        const response = await fetch(APIConfig.getGuestEndpoint(), {
+            method: "POST",
+            headers: {
+                "Content-type": "application/json"
+            },
+            body: JSON.stringify({
+                ip: clientIP,
+                page: page
+            })
+        })
+        if (response.ok) {
+            // console.log("ok response")
+            const data = await response.json();
+            // console.log("send ip success", data);
+            return data;
+        } else {
+            // throw new Error("Failed to login");
+            const data = await response.json();
+            // console.log(" fail to send ip ",data )
+            return data;
+        }
+    }
+    catch (error) {
+        // console.log(error)
+        return error;
+    }
+>>>>>>> Stashed changes
 }
 
 
 
 
 const formClick = document.querySelectorAll('.formClick');
+<<<<<<< Updated upstream
 formClick.forEach(form => form.addEventListener('click', function() {
+=======
+formClick.forEach(form => form.addEventListener('click', function () {
+>>>>>>> Stashed changes
     sendIpApi('form');
 }));
 

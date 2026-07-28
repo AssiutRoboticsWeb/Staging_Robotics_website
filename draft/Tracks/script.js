@@ -4,8 +4,8 @@
 
 
 
-// Global variable for server URL
-const serverUrl = 'https://assiut-robotics-zeta.vercel.app/Tracks/api'; // Replace with your server URL
+// Use dynamic server URL based on environment
+const serverUrl = serverConfig.getApiUrl('Tracks/api');
 // https://assiut-robotics-zeta.vercel.app/members/verify
 // State management
 // API Functions
@@ -78,7 +78,7 @@ if(!token){
       return window.location.href="../login/login.html"
   }
     try {
-      const response = await fetch(`https://assiut-robotics-zeta.vercel.app/members/joinCourse`, {
+      const response = await fetch(serverConfig.getApiUrl('members/joinCourse'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

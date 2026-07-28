@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Assiut Robotics</title>
+
+    <link rel="stylesheet" href="styles.css">
+    <!-- <link rel="stylesheet" href="../main/View.css"> -->
+    <link rel="stylesheet" href="../main/footerAndheader.css" />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" />
+
+    <link href="https://fonts.googleapis.com/css?family=Raleway:900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700&amp;subset=latin-ext"
+        rel="stylesheet" />
+
+    <!-- AOS Animation Library -->
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+
+    <link rel="shortcut icon" href="../all-images/logo.ico" />
+
+    <!-- Include jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Include Server Configuration -->
+    <script src="../config/server-config.js"></script>
+    <script src="../utiles/constants.js"></script>
+    <script src="../main/language-manager.js"></script>
+</head>
+
+<body>
+
+    <div id="myUniqueHeaderID"></div>
+
+    <main class="about-wrapper">
+
+        <!-- Hero -->
+        <section class="about-hero" data-aos="fade-up">
+            <h1 data-i18n="about_assiut_robotics">About Assiut Robotics</h1>
+            <p data-i18n="building_future_engineers_through_roboti">
+                Building future engineers through robotics, innovation, and teamwork since 2007.
+            </p>
+        </section>
+
+        <!-- About Content -->
+        <section class="about-section">
+
+            <div class="about-grid">
+
+                <!-- Text -->
+                <div class="about-text" data-aos="fade-right">
+                    <h2 data-i18n="who_we_are">Who We Are</h2>
+                    <p data-i18n="we_are_assiut_robotics_the_first_student">
+                        We are Assiut Robotics, the first student robotics team at Assiut University.
+                        We focus on practical engineering, competitions, and building real-world projects
+                        that prepare members for the industry.
+                    </p>
+
+                    <div class="mission-vision">
+
+                        <div class="card">
+                            <i class="fa fa-rocket"></i>
+                            <h3 data-i18n="mission">Mission</h3>
+                            <p data-i18n="empower_students_with_engineering_skills">
+                                Empower students with engineering skills and hands-on experience.
+                            </p>
+                        </div>
+
+                        <div class="card">
+                            <i class="fa fa-eye"></i>
+                            <h3 data-i18n="vision">Vision</h3>
+                            <p data-i18n="inspire_innovation_and_create_futureread">
+                                Inspire innovation and create future-ready engineers.
+                            </p>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Images -->
+                <div class="about-images" data-aos="fade-left">
+                    <img src="../introduction/imgs/group_image.jpg" alt="Team Image 1">
+                    <img src="../introduction/imgs/group_image2.jpg" alt="Team Image 2">
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <div id="myUniqueFooterID"></div>
+
+    <script src="../main/footerAndheader.js" defer></script>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+    <script>
+        AOS.init({
+            duration: 900,
+            once: true,
+            offset: 100
+        });
+    </script>
+
+</body>
+
+</html>

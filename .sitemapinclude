@@ -11,7 +11,11 @@ achievements/index_mins.html
 
 # Introduction / About
 introduction/index.html
+<<<<<<< Updated upstream
 about-us/about-us.html
+=======
+about-us/index.html
+>>>>>>> Stashed changes
 
 # Auth pages
 login/signup.html

@@ -6,12 +6,19 @@ var header = document.getElementById("header")
 var backward_BTN = `<div><button onclick = "window.history.back()" class ="backward" > <i class="fa-solid fa-angle-left " style="color: #FFD43B;" ></i> </button></div>`
 
 // backend api
+<<<<<<< Updated upstream
 const backendUrl = "https://assiut-robotics-zeta.vercel.app/";
+=======
+>>>>>>> Stashed changes
 //  =================  
 
 async function fetchTracks() {
     try {
+<<<<<<< Updated upstream
         const response = await fetch(`${backendUrl}/electric/getAllTracks`);
+=======
+        const response = await fetch(ServerConfig.getElectricalGetAllTracks());
+>>>>>>> Stashed changes
         const res = await response.json();
         if (!response.ok) {
             throw new Error('Failed to fetch tracks', response.message);
@@ -124,6 +131,7 @@ const teamData = {
 const electricData = {
     tracks: [
         {
+<<<<<<< Updated upstream
           name: "Embedded",
           icon: "<i class='fa fa-microchip'></i>",
           description: "كل ما يخص الأنظمة المدمجة.",
@@ -224,6 +232,108 @@ const electricData = {
           courses: [
             // ... كورسات وتاسكات
           ]
+=======
+            name: "Embedded",
+            icon: "<i class='fa fa-microchip'></i>",
+            description: "كل ما يخص الأنظمة المدمجة.",
+            courses: [
+                {
+                    name: "Intro to Embedded",
+                    description: "مقدمة عن الأنظمة المدمجة.",
+                    tasks: [
+                        {
+                            name: "Blink LED",
+                            description: "برمجة دائرة لجعل LED تضيء وتطفئ.",
+                            link: "https://example.com/blink",
+                            submitLink: "https://forms.gle/submit-blink",
+                            deadline: "2024-08-10"
+                        },
+                        {
+                            name: "Blink LED",
+                            description: "برمجة دائرة لجعل LED تضيء وتطفئ.",
+                            link: "https://example.com/blink",
+                            submitLink: "https://forms.gle/submit-blink",
+                            deadline: "2024-07-15"
+                        },
+                        {
+                            name: "Blink LED",
+                            description: "برمجة دائرة لجعل LED تضيء وتطفئ.",
+                            link: "https://example.com/blink",
+                            submitLink: "https://forms.gle/submit-blink",
+                            deadline: "2024-07-20"
+                        },
+                        // ... باقي التاسكات كما هي
+                    ]
+                },
+                {
+                    name: "Intro to Embedded",
+                    description: "مقدمة عن الأنظمة المدمجة.",
+                    tasks: [
+                        {
+                            name: "Blink LED",
+                            description: "برمجة دائرة لجعل LED تضيء وتطفئ.",
+                            link: "https://example.com/blink",
+                            submitLink: "https://forms.gle/submit-blink",
+                            deadline: "2024-07-10"
+                        },
+                        {
+                            name: "Blink LED",
+                            description: "برمجة دائرة لجعل LED تضيء وتطفئ.",
+                            link: "https://example.com/blink",
+                            submitLink: "https://forms.gle/submit-blink",
+                            deadline: "2024-07-15"
+                        },
+                        {
+                            name: "Blink LED",
+                            description: "برمجة دائرة لجعل LED تضيء وتطفئ.",
+                            link: "https://example.com/blink",
+                            submitLink: "https://forms.gle/submit-blink",
+                            deadline: "2024-07-20"
+                        },
+                        // ... باقي التاسكات كما هي
+                    ]
+                },
+                {
+                    name: "Intro to Embedded",
+                    description: "مقدمة عن الأنظمة المدمجة.",
+                    tasks: [
+                        {
+                            name: "Blink LED",
+                            description: "برمجة دائرة لجعل LED تضيء وتطفئ.",
+                            link: "https://example.com/blink",
+                            submitLink: "https://forms.gle/submit-blink",
+                            deadline: "2024-07-10"
+                        },
+                        {
+                            name: "Blink LED",
+                            description: "برمجة دائرة لجعل LED تضيء وتطفئ.",
+                            link: "https://example.com/blink",
+                            submitLink: "https://forms.gle/submit-blink",
+                            deadline: "2024-07-15"
+                        },
+                        {
+                            name: "Blink LED",
+                            description: "برمجة دائرة لجعل LED تضيء وتطفئ.",
+                            link: "https://example.com/blink",
+                            submitLink: "https://forms.gle/submit-blink",
+                            deadline: "2024-08-20"
+                        },
+
+                        // ... المزيد من التاسكات
+                    ]
+                },
+
+                // ... المزيد من الكورسات
+            ]
+        },
+        {
+            name: "Hardware",
+            icon: "<i class='fa fa-cogs'></i>",
+            description: "كل ما يخص الهاردوير.",
+            courses: [
+                // ... كورسات وتاسكات
+            ]
+>>>>>>> Stashed changes
         }
         // ... المزيد من التراكات
     ],         // هتحط فيه التراكات
@@ -321,12 +431,21 @@ const electricData = {
     }
 };
 
+<<<<<<< Updated upstream
 function getAllData(){
     fetch("https://tempbackendelectrical-production.up.railway.app/api/data")
         .then(res => res.json())
         .then(res => {
             console.log(res);
             
+=======
+function getAllData() {
+    fetch(ServerConfig.getElectricalData())
+        .then(res => res.json())
+        .then(res => {
+            console.log(res);
+
+>>>>>>> Stashed changes
         }
         )
 }
@@ -334,7 +453,11 @@ function getAllData(){
 // Render leaderboard with animation
 function renderLeaderboard(trackName = 'All Tracks', trackData) {
     console.log("rendering Leaderboard");
+<<<<<<< Updated upstream
     
+=======
+
+>>>>>>> Stashed changes
     const leaderboardList = document.getElementById('leaderboardList');
     leaderboardList.style.opacity = '0';
     setTimeout(() => {
@@ -366,7 +489,11 @@ function renderTeam(teamArray, containerId) {
     console.log("finished from rendering team");
 }
 
+<<<<<<< Updated upstream
 function goHome(){
+=======
+function goHome() {
+>>>>>>> Stashed changes
     home.classList.remove("disabled");
     header.classList.remove("disabled");
     track.classList.add("disabled");
@@ -375,9 +502,15 @@ function goHome(){
 }
 
 
+<<<<<<< Updated upstream
 function renderTracks(tracks){
     console.log("rendering tracks in  home page");
     
+=======
+function renderTracks(tracks) {
+    console.log("rendering tracks in  home page");
+
+>>>>>>> Stashed changes
     var tracksCards = document.getElementsByClassName("tracks")[0];
     tracksCards.innerHTML += tracks.map(track => {
         return `
@@ -389,11 +522,19 @@ function renderTracks(tracks){
         `
     }).join('');
     console.log("finished rendering tracks");
+<<<<<<< Updated upstream
     
 }
 
 let currentTrack = null;
 function tapSwitching(e){
+=======
+
+}
+
+let currentTrack = null;
+function tapSwitching(e) {
+>>>>>>> Stashed changes
     currentTrack = e.id;
     renderTrack(electricData.tracks, currentTrack, track)
     home.classList.add("disabled");
@@ -401,10 +542,17 @@ function tapSwitching(e){
     track.classList.remove("disabled");
     courseContainer.classList.add("disabled");
     // سجل الحالة في history
+<<<<<<< Updated upstream
     history.pushState({view: 'track', trackName: currentTrack}, '', '');
 }
 
 function renderTrack(tracks, trackName, trackContainer){
+=======
+    history.pushState({ view: 'track', trackName: currentTrack }, '', '');
+}
+
+function renderTrack(tracks, trackName, trackContainer) {
+>>>>>>> Stashed changes
     let track = tracks.find(track => track.name === trackName);
     if (!track || !Array.isArray(track.courses)) {
         trackContainer.innerHTML = "<p>No courses found for this track.</p>";
@@ -414,8 +562,13 @@ function renderTrack(tracks, trackName, trackContainer){
 
 
     let trackDetails =
+<<<<<<< Updated upstream
     
     `
+=======
+
+        `
+>>>>>>> Stashed changes
         <div class="track-details">
             <div class="track-icon">${track.icon || ""}</div>
             <h2>${track.name}</h2>
@@ -452,7 +605,11 @@ function tasksRendering(e) {
     courseContainer.classList.remove("disabled");
     renderCourse(course, courseContainer);
     // سجل الحالة في history
+<<<<<<< Updated upstream
     history.pushState({view: 'course', trackName: currentTrack, courseName: courseName}, '', '');
+=======
+    history.pushState({ view: 'course', trackName: currentTrack, courseName: courseName }, '', '');
+>>>>>>> Stashed changes
 }
 
 function renderCourse(course, courseContainer) {

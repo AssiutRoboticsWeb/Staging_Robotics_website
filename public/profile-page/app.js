@@ -1,8 +1,17 @@
-// ---------------------- Config & API endpoints ----------------------
-const API_URL = `${API_BASE_URL}/members/login`;
-const VERIFY_URL = `${API_BASE_URL}/members/verify`;
-const CHANGE_PROFILE_IMAGE_URL = `${API_BASE_URL}/members/changeProfileImage`;
-const SUBMIT_TASK_URL = `${API_BASE_URL}/members/submitTask`;
+
+// API URLs
+// const API_URL = "https://assiut-robotics-zeta.vercel.app/members/login";
+// const VERIFY_URL = "https://assiut-robotics-zeta.vercel.app/members/verify";
+// const CHANGE_AVATAR_URL =
+//   "https://assiut-robotics-zeta.vercel.app/members/changeProfileImage";
+// const SUBMIT_TASK_URL =
+//   "https://assiut-robotics-zeta.vercel.app/members/submitTask";
+
+// API URLs - Now using centralized server configuration
+const API_URL = ServerConfig.getMembersLogin();
+const VERIFY_URL = ServerConfig.getMembersVerify();
+const CHANGE_AVATAR_URL = ServerConfig.getMembersChangeProfile();
+const SUBMIT_TASK_URL = ServerConfig.getMembersSubmitTask();
 
 // ---------------------- State ----------------------
 let currentMemberData = null;
@@ -20,8 +29,8 @@ const userPhone = document.getElementById("userPhone");
 const userStatus = document.getElementById("userStatus");
 const avgRate = document.getElementById("avgRate");
 
-const darkModeToggle = document.getElementById("darkModeToggle");
-const changeAvatarBtn = document.getElementById("changeAvatarBtn");
+
+// const changeAvatarBtn = document.getElementById("changeAvatarBtn");
 const avatarInput = document.getElementById("avatarInput");
 const submitTaskModal = document.getElementById("submitTaskModal");
 const submitTaskForm = document.getElementById("submitTaskForm");
@@ -157,7 +166,7 @@ function renderMemberData(data) {
   headerButtons.appendChild(labDatesBtn);
 
   // Add Date for OC only
-  if ((data.committee || "").trim() === "OC") {
+  if ((data.committee || "").trim() === AppConstants.COMMITTEES.OC) {
     const addDateBtn = document.createElement("a");
     addDateBtn.id = "addDate";
     addDateBtn.href = "../lapDates/addDate.html";
@@ -166,6 +175,9 @@ function renderMemberData(data) {
     headerButtons.appendChild(addDateBtn);
   }
 
+  userRole.className = `user-role ${data.role?.toLowerCase()}`;
+  userRole.innerHTML = `<i class="fas fa-user-shield"></i> ${data.role}`;
+
   // Build categorized links
   const categorized = buildCategorizedLinks(data);
   renderRelatedLinksUI(categorized);
@@ -173,13 +185,13 @@ function renderMemberData(data) {
 
 // ---------------------- Build categorized links ----------------------
 function buildCategorizedLinks(user) {
-  // ترتيب ثابت للتصنيفات
+
   const cats = {
-    General: [],
-    Meetings: [],
-    Management: [],
-    Educational: [],
-    Committee: [],
+    [AppConstants.COMMON_CATEGORIES.GENERAL]: [],
+    [AppConstants.COMMON_CATEGORIES.MEETINGS]: [],
+    [AppConstants.COMMON_CATEGORIES.MANAGEMENT]: [],
+    [AppConstants.COMMON_CATEGORIES.EDUCATIONAL]: [],
+    [AppConstants.COMMON_CATEGORIES.COMMITTEE]: [],
   };
 
   // general
@@ -189,22 +201,22 @@ function buildCategorizedLinks(user) {
   const committeeKey = (user.committee || "").trim();
   if (Links[committeeKey]) {
     (Links[committeeKey].member || []).forEach((l) =>
-      pushByCat(cats, { ...l, category: l.category || "Committee" })
+      pushByCat(cats, { ...l, category: l.category || AppConstants.COMMON_CATEGORIES.COMMITTEE })
     );
-    if (user.role === "head" || user.role === "vice") {
+    if (user.role === AppConstants.MEMBER_ROLES.HEAD || user.role === AppConstants.MEMBER_ROLES.VICE) {
       (Links[committeeKey].head || []).forEach((l) =>
-        pushByCat(cats, { ...l, category: l.category || "Committee" })
+        pushByCat(cats, { ...l, category: l.category || AppConstants.COMMON_CATEGORIES.COMMITTEE })
       );
     }
   }
 
   // heads
-  if (user.role === "head" || user.role === "vice") {
+  if (user.role === AppConstants.MEMBER_ROLES.HEAD || user.role === AppConstants.MEMBER_ROLES.VICE) {
     (Links.head.head || []).forEach((l) => pushByCat(cats, l));
   }
 
   // leaders
-  if (user.role === "leader" || user.role === "viceLeader") {
+  if (user.role === AppConstants.MEMBER_ROLES.LEADER || user.role === AppConstants.MEMBER_ROLES.VICE_LEADER) {
     (Links.leader.member || []).forEach((l) => pushByCat(cats, l));
   }
 
@@ -212,7 +224,7 @@ function buildCategorizedLinks(user) {
 }
 
 function pushByCat(cats, linkObj) {
-  const cat = (linkObj.category || "General");
+  const cat = (linkObj.category || AppConstants.COMMON_CATEGORIES.GENERAL);
   if (!cats[cat]) cats[cat] = [];
   cats[cat].push(linkObj);
 }
@@ -231,7 +243,7 @@ function renderRelatedLinksUI(cats) {
     rlCategory.appendChild(opt);
   });
 
-  const firstAvailable = entries.find(([, arr]) => arr.length > 0)?.[0] || "General";
+  const firstAvailable = entries.find(([, arr]) => arr.length > 0)?.[0] || AppConstants.COMMON_CATEGORIES.GENERAL;
   rlCategory.value = firstAvailable;
 
   // دالة لعرض الكروت لتصنيف معين
@@ -266,10 +278,10 @@ function renderRelatedLinksUI(cats) {
 
 function iconForCategory(cat) {
   switch (cat) {
-    case "Meetings": return "fas fa-handshake";
-    case "Management": return "fas fa-gear";
-    case "Educational": return "fas fa-graduation-cap";
-    case "Committee": return "fas fa-users";
+    case AppConstants.COMMON_CATEGORIES.MEETINGS: return "fas fa-handshake";
+    case AppConstants.COMMON_CATEGORIES.MANAGEMENT: return "fas fa-gear";
+    case AppConstants.COMMON_CATEGORIES.EDUCATIONAL: return "fas fa-graduation-cap";
+    case AppConstants.COMMON_CATEGORIES.COMMITTEE: return "fas fa-users";
     default: return "fas fa-link";
   }
 }
@@ -304,7 +316,8 @@ function closeRelatedLinksPopup() {
 }
 
 // ---------------------- Avatar ----------------------
-changeAvatarBtn.addEventListener("click", () => avatarInput.click());
+userAvatar.addEventListener("click", () => avatarInput.click());
+
 avatarInput.addEventListener("change", (e) => {
   if (e.target.files?.[0]) changeAvatar(e.target.files[0]);
 });
@@ -317,7 +330,7 @@ async function changeAvatar(file) {
   formData.append("image", file);
 
   try {
-    const res = await fetch(CHANGE_PROFILE_IMAGE_URL, {
+    const res = await fetch(ServerConfig.getMembersChangeProfile(), {
       method: "POST",
       headers: { Authorization: `Bearer ${token}` },
       body: formData,
@@ -369,11 +382,20 @@ async function submitCurrentTask(formData) {
   if (!token) return;
 
   try {
-    const res = await fetch(`${API_BASE_URL}/members/submitMemberTask/${currentTaskId}`, {
-      method: "PUT",
-      headers: { Authorization: `Bearer ${token}` },
-      body: formData,
-    });
+    console.log(currentTaskId);
+
+    const response = await fetch(
+      // `https://assiut-robotics-zeta.vercel.app/members/submitMemberTask/${currentTaskId}`,
+      ServerConfig.getMembersSubmitMemberTask(currentTaskId),
+      {
+        method: "PUT",
+        headers: {
+          // 'contentType': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      }
+    );
 
     const data = await res.json();
     if (!res.ok) throw new Error(data?.message || "Submit failed");
@@ -522,19 +544,6 @@ function renderHistoryTasks(tasks = []) {
   });
 }
 
-// ---------------------- Dark Mode ----------------------
-function initializeDarkMode() {
-  const isDark = localStorage.getItem("darkMode") === "true";
-  document.body.classList.toggle("dark-mode", isDark);
-  darkModeToggle.setAttribute("aria-pressed", String(isDark));
-
-  darkModeToggle.addEventListener("click", () => {
-    const toggled = !document.body.classList.contains("dark-mode");
-    document.body.classList.toggle("dark-mode", toggled);
-    localStorage.setItem("darkMode", String(toggled));
-    darkModeToggle.setAttribute("aria-pressed", String(toggled));
-  });
-}
 
 // ---------------------- Notifications ----------------------
 function toggleNotifications() {
@@ -618,6 +627,7 @@ function initialize() {
     setupRelatedLinksToggle();
     initializeDarkMode();
     loadNotifications();
+
   });
 
   // Esc to close modal or links popup
@@ -631,6 +641,23 @@ function initialize() {
       }
     }
   });
+
+  // Logout
+  const logoutBtn = document.getElementById("logoutBtn");
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", () => {
+      localStorage.removeItem("token");
+      localStorage.removeItem("data");
+      showToast("Logged out successfully", "success");
+      setTimeout(() => {
+        window.location.href = "../login/login.html";
+      }, 1500);
+    });
+  }
 }
 
-initialize();
+window.addEventListener("load", () => {
+  initialize();
+});
+
+
