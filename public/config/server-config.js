@@ -14,8 +14,8 @@
             legacyBase: "http://localhost:3000"
         },
         production: {
-            apiBase: "https://assiut-robotics-server.vercel.app", // Main centralized server
-            tracksBase: "https://assiut-robotics-server.vercel.app",
+            apiBase: window.location.hostname.includes('staging') ? "https://staging-robotics-server.vercel.app" : "https://assiut-robotics-server.vercel.app", // Main centralized server
+            tracksBase: window.location.hostname.includes('staging') ? "https://staging-robotics-server.vercel.app" : "https://assiut-robotics-server.vercel.app",
             electricalBase: "https://tempbackendelectrical-production.up.railway.app",
             legacyBase: "https://assiutrobotics-production.up.railway.app"
         }
@@ -115,7 +115,7 @@
     function detectEnvironment() {
         const hostname = window.location.hostname;
         const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
-        const isDevelopment = hostname.includes('dev') || hostname.includes('staging');
+        const isDevelopment = hostname.includes('dev');
         const devFlag = localStorage.getItem('DEV_MODE') === 'true';
 
         return (isLocalhost || isDevelopment || devFlag) ? 'development' : 'production';
