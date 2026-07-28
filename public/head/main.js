@@ -92,16 +92,7 @@ navMenu.addEventListener('click', (e) => {
 // Fetch and display members
 async function fetchMembers() {
     try {
-<<<<<<< Updated upstream
-        const response = await fetch(`${baseUrl}/members/get/${committee}`, {
-            method : "GET",
-            headers : {
-                authorization : "bearer " + token
-            }
-        });
-=======
         const response = await fetch(APIConfig.getMembersEndpoint(`/get/${committee}`));
->>>>>>> Stashed changes
         const data = await response.json();
         console.log(data);
         if (data.message == "token is required") {

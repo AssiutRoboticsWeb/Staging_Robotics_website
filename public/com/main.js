@@ -661,11 +661,11 @@ const sendIpApi = async (page) => {
     try{
     const clientIP = await getClientIP();
     console.log("api function ", page, clientIP)
-<<<<<<< Updated upstream
+
     const response = await fetch(`https://assiut-robotics-server.vercel.app/guest`,{
-=======
+
     const response = await fetch(serverConfig.getApiUrl('guest'),{
->>>>>>> Stashed changes
+
         method: "POST",
         headers: {
             "Content-type": "application/json"
