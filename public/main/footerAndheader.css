@@ -331,7 +331,6 @@ body.dark .activity-card {
 /* Header */
 
 .topnav {
-    overflow: hidden;
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
@@ -348,6 +347,19 @@ body.dark .activity-card {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     padding: 0 20px;
     transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.lang-search-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin: 10px 0;
+}
+
+.global-search-container {
+    position: relative;
+    margin: 0;
 }
 
 .backdrop-container {
