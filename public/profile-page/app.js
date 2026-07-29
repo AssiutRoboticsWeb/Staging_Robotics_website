@@ -149,6 +149,7 @@ function renderMemberData(data) {
   userAvatar.alt = `${data.name}'s avatar`;
   userName.textContent = data.name;
   userRole.textContent = data.role;
+  document.getElementById("userRoleInfo").textContent = data.role;
   userEmail.textContent = data.email;
   userCommittee.textContent = data.committee;
   userPhone.textContent = data.phoneNumber;
@@ -329,6 +330,7 @@ async function changeAvatar(file) {
   const formData = new FormData();
   formData.append("image", file);
 
+  if (window.showLoading) window.showLoading("Changing Avatar...");
   try {
     const res = await fetch(ServerConfig.getMembersChangeProfile(), {
       method: "POST",
@@ -343,6 +345,8 @@ async function changeAvatar(file) {
   } catch (err) {
     console.error("Error changing avatar:", err);
     alert(err.message);
+  } finally {
+    if (window.hideLoading) window.hideLoading();
   }
 }
 
@@ -351,6 +355,7 @@ async function submitTask(submissionLink) {
   const token = localStorage.getItem("token");
   if (!token) return;
 
+  if (window.showLoading) window.showLoading("Submitting Task...");
   try {
     const res = await fetch(SUBMIT_TASK_URL, {
       method: "POST",
@@ -373,6 +378,8 @@ async function submitTask(submissionLink) {
     window.location.reload();
   } catch (err) {
     alert(err.message);
+  } finally {
+    if (window.hideLoading) window.hideLoading();
   }
 }
 
@@ -381,6 +388,7 @@ async function submitCurrentTask(formData) {
   const token = localStorage.getItem("token");
   if (!token) return;
 
+  if (window.showLoading) window.showLoading("Submitting Task...");
   try {
     console.log(currentTaskId);
 
@@ -397,8 +405,8 @@ async function submitCurrentTask(formData) {
       }
     );
 
-    const data = await res.json();
-    if (!res.ok) throw new Error(data?.message || "Submit failed");
+    const data = await response.json(); // Fixed res.json() to response.json()
+    if (!response.ok) throw new Error(data?.message || "Submit failed");
 
     alert(data.message || "Submitted");
     window.location.reload();
@@ -409,6 +417,8 @@ async function submitCurrentTask(formData) {
     }
     console.error(error);
     alert(error.message);
+  } finally {
+    if (window.hideLoading) window.hideLoading();
   }
 }
 
@@ -625,9 +635,7 @@ function handleApply(index, buttonEl, liEl) {
 function initialize() {
   verifyToken().then(() => {
     setupRelatedLinksToggle();
-    initializeDarkMode();
     loadNotifications();
-
   });
 
   // Esc to close modal or links popup

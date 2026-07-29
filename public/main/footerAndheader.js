@@ -158,14 +158,14 @@ function setupLogin() {
     // Update button visibility based on login status
     if (token) {
         // User is logged in → Show Profile, hide Log In and Register
-        loginButton.style.display = "none";
+        if (loginButton) loginButton.style.display = "none";
         // registerButton.style.display = "none";
-        profileButton.style.display = "inline-block";
+        if (profileButton) profileButton.style.display = "inline-block";
     } else {
         // User is NOT logged in → Show Log In and Register, hide Profile
-        loginButton.style.display = "inline-block";
+        if (loginButton) loginButton.style.display = "inline-block";
         // registerButton.style.display = "inline-block";
-        profileButton.style.display = "none";
+        if (profileButton) profileButton.style.display = "none";
         
         // Hide search if not logged in
         const searchContainer = document.querySelector('.global-search-container');
@@ -202,10 +202,12 @@ function setupScrollTop() {
     window.addEventListener('scroll', function () {
         if (window.scrollY > AppConstants.UI_CONFIG.SCROLL_THRESHOLD) {
             btn.classList.add('visible');
+            document.body.classList.add('scrolled');
         } else {
             // Arrived at top — remove launching state and hide button
             btn.classList.remove('visible');
             btn.classList.remove('launching');
+            document.body.classList.remove('scrolled');
         }
     }, { passive: true });
 
@@ -292,7 +294,8 @@ window.addEventListener('load', () => {
                             method: 'GET',
                             headers: {
                                 'Content-Type': 'application/json',
-                                'Accept': 'application/json'
+                                'Accept': 'application/json',
+                                ...(token ? { 'Authorization': `Bearer ${token}` } : {})
                             },
                             credentials: 'include'
                         });
@@ -356,3 +359,79 @@ window.addEventListener('load', () => {
         }
     }, 1000); // Give header 1 second to load
 });
+
+/* Loading utility – show/hide a premium overlay */
+
+(function() {
+  const overlay = document.createElement('div');
+  overlay.id = 'globalLoading';
+  overlay.className = 'loading-overlay';
+  overlay.innerHTML = `
+    <div class="spinner"></div>
+    <div class="loading-message" id="loadingMessage">Loading...</div>
+  `;
+  
+  // Wait for body to exist before appending
+  const appendOverlay = () => {
+    if (document.body) {
+      document.body.appendChild(overlay);
+    } else {
+      setTimeout(appendOverlay, 50);
+    }
+  };
+  appendOverlay();
+
+  // expose helpers globally
+  window.showLoading = function(message = 'Loading...') {
+    const msgEl = document.getElementById('loadingMessage');
+    if (msgEl) msgEl.textContent = message;
+    overlay.classList.add('active');
+  };
+
+  window.hideLoading = function() {
+    overlay.classList.remove('active');
+  };
+
+  // Global Fetch Interceptor to automatically show loading spinner
+  let activeRequests = 0;
+  const originalFetch = window.fetch;
+  
+  window.fetch = async function(...args) {
+    const url = args[0];
+    const options = args[1] || {};
+    const method = (options.method || 'GET').toUpperCase();
+    
+    // Ignore static files and background pings
+    const isBackground = typeof url === 'string' && (
+      url.endsWith('.json') || 
+      url.endsWith('.html') || 
+      url.includes('api.ipify.org')
+    );
+
+    // Show loading for modifying requests or anything that isn't a static/background fetch
+    const shouldShowLoader = !isBackground && (
+      ['POST', 'PUT', 'DELETE', 'PATCH'].includes(method) || 
+      (typeof url === 'string' && url.includes('/api/')) || 
+      (typeof url === 'string' && url.includes('/members/')) || 
+      (typeof url === 'string' && url.includes('/components/'))
+    );
+
+    if (shouldShowLoader) {
+      activeRequests++;
+      if (window.showLoading) window.showLoading("Processing...");
+    }
+    
+    try {
+      const response = await originalFetch.apply(this, args);
+      return response;
+    } finally {
+      if (shouldShowLoader) {
+        activeRequests--;
+        if (activeRequests <= 0) {
+          activeRequests = 0;
+          if (window.hideLoading) window.hideLoading();
+        }
+      }
+    }
+  };
+})();
