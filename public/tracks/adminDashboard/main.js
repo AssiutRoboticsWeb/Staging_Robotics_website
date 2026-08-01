@@ -85,7 +85,7 @@ function getTrack() {
     method: "GET",
     headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
   })
-    .then((r) => { if (r.status === 401) { window.location.href = "../../login/login.html"; return; } return r.json(); })
+    .then((r) => { if (r.status === 401) { /* window.location.href = "../../login/login.html"; return;  */} return r.json();} )
     .then((data) => {
       if (data && data.data) {
         electricData.tracks = data.data.map((t) => ({
