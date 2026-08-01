@@ -144,7 +144,7 @@ function renderTracks() {
         if (confirm("Delete this track?")) {
           fetch(`${backendURL}tracks/${track._id}`, { method: "DELETE", headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } })
             .then((res) => {
-              if (!res.ok) { if (res.status === 401) { window.location.href = "../../login/login.html"; return; } throw new Error(); }
+              if (!res.ok) { if (res.status === 401) { /*window.location.href = "../../login/login.html"; return; */ } throw new Error(); }
               electricData.tracks.splice(idx, 1);
               showNotification("Track deleted","success");
               renderTracks();
@@ -187,7 +187,7 @@ function renderCourses(trackIdx) {
     method: "GET",
     headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
   })
-    .then((r) => { if (r.status === 401) { window.location.href = "../../login/login.html"; return; } return r.json(); })
+    .then((r) => { if (r.status === 401) { /* window.location.href = "../../login/login.html"; return; */ } return r.json(); })
     .then((data) => {
       if (Array.isArray(data?.data)) {
         track.courses = data.data.map(c => ({ ...c, admins: Array.isArray(c.admins) ? c.admins : [] }));
